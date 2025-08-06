@@ -73,114 +73,167 @@ class TelaCruzadinha(MDScreen):
 
         self.gerar_cruzadinha()
 
-    def gerar_operacao_valida(self, op, forcar_valor=None):
-        if op == "+":
-            a = random.randint(2, 30)
-            b = random.randint(2, 30)
-            return a, b, a + b
-        elif op == "-":
-            a = random.randint(10, 40)
-            b = random.randint(1, a)
-            return a, b, a - b
-        elif op == "×":
-            if forcar_valor is not None:
-                # Queremos que a * b = forcar_valor
-                # Escolhe um divisor aleatório de forcar_valor
-                divisores = [i for i in range(1, forcar_valor + 1) if forcar_valor % i == 0]
-                a = random.choice(divisores)
-                b = forcar_valor // a
-                return a, b, forcar_valor
-            else:
-                a = random.randint(2, 10)
-                b = random.randint(2, 10)
-                return a, b, a * b
-        elif op == "÷":
-            b = random.randint(2, 10)
-            res = random.randint(2, 10)
-            a = b * res
-            return a, b, res
-
-
     def gerar_cruzadinha(self):
         self.inputs.clear()
         self.gabarito.clear()
         self.grid.clear_widgets()
 
         layout = [
-            ["VAL", "÷", "", "=", "VAL"],
-            ["-", None, "×", None, "×"],
+            ["VAL", "+", "", "=", "VAL"],
+            ["-", None, "÷", None, "×"],
             ["", None, "", None, ""],
             ["=", None, "=", None, "="],
-            ["VAL", "+", "VAL", "=", ""]
+            ["VAL", "+", "VAL", "=", "VAL"]
         ]
 
         matriz = [[None for _ in range(5)] for _ in range(5)]
 
-        # 1) Primeira linha: a ÷ b = res
-        a1, b1, res1 = self.gerar_operacao_valida("÷")
-        matriz[0][0] = a1
-        matriz[0][2] = b1
-        matriz[0][4] = res1
+        while True:
+            val_40 = random.randint(2, 10)
+            val_22 = random.randint(2, 5)
+            val_04 = val_40 * val_22
 
-        # 2) Linha 5: soma
-        a2, b2, res2 = self.gerar_operacao_valida("+")
-        matriz[4][0] = a2
-        matriz[4][2] = b2
-        matriz[4][4] = res2
+            if val_04 < 20:
+                continue
 
-        # 3) Coluna 1:  a1 - x = a2  → x = a1 - a2
-        matriz[2][0] = a1 - a2
+            min_val_00 = 10
+            max_val_00 = val_04 - 10
+            if max_val_00 < min_val_00:
+                continue
 
-        # 4) Coluna 3: multiplicação → usa res1 como um dos fatores, faz: res1 × x = ?
-        mult_a = res1
-        mult_b = random.randint(2, 10)
-        mult_res = mult_a * mult_b
-        matriz[2][2] = mult_a
-        matriz[2][4] = mult_b
-        matriz[4][2] = mult_res  # já foi preenchido na linha 5, mas pode ser sobrescrito com valor correto
+            val_00 = random.randint(min_val_00, max_val_00)
+            val_02 = val_04 - val_00
+            val_20 = val_00 - val_40
 
-        # Monta a grade com widgets
+            if val_20 < 1:
+                continue
+
+            if val_02 % val_22 != 0:
+                continue
+
+            val_42 = val_02 // val_22
+            val_44 = val_40 + val_42
+
+            if val_44 == 0 or val_04 % val_44 != 0:
+                continue
+
+            val_24 = val_04 // val_44
+            break
+
+        matriz[0][0] = val_00
+        matriz[0][2] = val_02
+        matriz[0][4] = val_04
+        matriz[2][0] = val_20
+        matriz[2][2] = val_22
+        matriz[2][4] = val_24
+        matriz[4][0] = val_40
+        matriz[4][2] = val_42
+        matriz[4][4] = val_44
+
         for i in range(5):
             for j in range(5):
                 val = layout[i][j]
                 dado = matriz[i][j]
+                conteudo = None
+
                 if val is None:
-                    self.grid.add_widget(MDCard(md_bg_color=(0, 0, 0, 0), radius=[dp(4)], elevation=0, size_hint=(1, 1)))
+                    conteudo = MDCard(
+                        md_bg_color=(0, 0, 0, 0),
+                        style="outlined",
+                        line_color=(0, 0, 0, 1),
+                        radius=[dp(4)],
+                        size_hint=(1, 1),
+                        elevation=0,
+                    )
                 elif val == "":
-                    campo = TextInput(multiline=False, halign="center", font_size=24, size_hint=(1, 1),
-                                      background_color=(1, 1, 1, 0.9), foreground_color=(0, 0, 0, 1))
+                    if dado is None:
+                        dado = 0
+                    campo = TextInput(
+                        multiline=False,
+                        halign="center",
+                        font_size=32,
+                        font_name="ComicNeue",
+                        size_hint=(1, 1),
+                        background_color=(1, 1, 1, 0),
+                        foreground_color=(1, 1, 1, 1),
+                        cursor_color=(1, 1, 1, 1),
+                        padding=(10, 10)
+                    )
                     self.inputs.append(campo)
                     self.gabarito.append(str(dado))
-                    self.grid.add_widget(campo)
+
+                    conteudo = MDCard(
+                        md_bg_color=(0, 0, 0, 0),
+                        style="outlined",
+                        line_color=(0, 0, 0, 1),
+                        padding=dp(4),
+                        size_hint=(1, 1),
+                        elevation=0,
+                    )
+                    conteudo.add_widget(campo)
                 elif val in ["+", "-", "×", "÷", "="]:
-                    lbl = MDLabel(text=val, halign="center", valign="middle", font_style="H6",
-                                  theme_text_color="Custom", text_color=(1, 1, 1, 1))
-                    lbl.bind(size=lbl.setter('text_size'))
-                    self.grid.add_widget(lbl)
+                    lbl = MDLabel(
+                        text=val,
+                        halign="center",
+                        valign="middle",
+                        font_style="H6",
+                        font_size="32sp",
+                        font_name="ComicNeue",
+                        theme_text_color="Custom",
+                        text_color=(1, 1, 1, 1),
+                    )
+                    lbl.bind(size=lbl.setter("text_size"))
+                    conteudo = MDCard(
+                        md_bg_color=(0, 0, 0, 0),
+                        style="outlined",
+                        line_color=(0, 0, 0, 1),
+                        padding=dp(4),
+                        size_hint=(1, 1),
+                        elevation=0,
+                    )
+                    conteudo.add_widget(lbl)
                 elif val == "VAL":
-                    lbl = MDLabel(text=str(dado), halign="center", valign="middle", font_style="H6",
-                                  theme_text_color="Custom", text_color=(1, 1, 1, 1))
-                    lbl.bind(size=lbl.setter('text_size'))
-                    self.grid.add_widget(lbl)
+                    if dado is None:
+                        dado = 0
+                    lbl = MDLabel(
+                        text=str(dado),
+                        halign="center",
+                        valign="middle",
+                        font_style="H6",
+                        font_size="32sp",
+                        font_name="ComicNeue",
+                        theme_text_color="Custom",
+                        text_color=(1, 1, 1, 1),
+                    )
+                    lbl.bind(size=lbl.setter("text_size"))
+                    conteudo = MDCard(
+                        md_bg_color=(0, 0, 0, 0),
+                        style="outlined",
+                        line_color=(0, 0, 0, 1),
+                        padding=dp(4),
+                        size_hint=(1, 1),
+                        elevation=0,
+                    )
+                    conteudo.add_widget(lbl)
+
+                self.grid.add_widget(conteudo)
+
+        print("Gabarito esperado:", self.gabarito)
 
 
     def verificar_respostas(self, texto):
         pontuacao = 0
         for campo, resposta_correta in zip(self.inputs, self.gabarito):
-            resposta = campo.text.strip().replace(",", ".")  # Corrige vírgula para ponto
-
+            resposta = campo.text.strip().replace(",", ".")
             try:
                 if int(float(resposta)) == int(float(resposta_correta)):
                     pontuacao += 10
-                    campo.background_color = (0.6, 1, 0.6, 0.8)  # Verde
+                    campo.background_color = (0.6, 1, 0.6, 0.8)
                 else:
-                    campo.background_color = (1, 0.6, 0.6, 0.8)  # Vermelho
+                    campo.background_color = (1, 0.6, 0.6, 0.8)
             except:
                 campo.background_color = (1, 0.6, 0.6, 0.8)
-
         self.pontuacao_label.text = f"Pontuação: {pontuacao}"
-
-
 
     def limpar_respostas(self, texto):
         for campo in self.inputs:
@@ -190,10 +243,10 @@ class TelaCruzadinha(MDScreen):
     def nova_cruzadinha(self, texto):
         self.limpar_respostas(texto)
         self.gerar_cruzadinha()
-        self.pontuacao_label.text = "Pontuação: 0"
 
     def voltar(self, instance):
         print("Voltando para o menu")
+
 
 class AppCruzadinhaMD(MDApp):
     def build(self):

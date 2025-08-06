@@ -24,12 +24,7 @@ class TelaJogar(Screen):
         self.bg_image = Image(source='fundoapp.png', allow_stretch=True, keep_ratio=False)
         layout.add_widget(self.bg_image)
 
-        self.theme_button = MDIconButton(
-            icon='cog',
-            pos_hint={'right': 1, 'top': 1},
-            on_release=self.toggle_theme
-        )
-        layout.add_widget(self.theme_button)
+
 
         titulo = MDLabel(
             text=f"{dificuldade}\nSelecione o jogo que deseja jogar:",
@@ -99,18 +94,6 @@ class TelaJogar(Screen):
 
         self.manager.current = jogo["tela"]
 
-
-    def toggle_theme(self, *args):
-        app = App.get_running_app()
-        theme_cls = app.theme_cls
-        theme_cls.theme_style = "Dark" if theme_cls.theme_style == "Light" else "Light"
-        app.current_theme = theme_cls.theme_style
-        self.bg_image.source = "escuro.png" if app.current_theme == "Dark" else "fundoapp.png"
-
-    def on_pre_enter(self, *args):
-        app = App.get_running_app()
-        self.bg_image.source = "escuro.png" if app.current_theme == "Dark" else "fundoapp.png"
-
     def voltar(self, instance):
         self.manager.current = "seleciona"
 
@@ -177,13 +160,6 @@ class TelaEscolhaNivel(Screen):
 
         self.bg_image = Image(source='fundoapp.png', allow_stretch=True, keep_ratio=False)
         layout.add_widget(self.bg_image)
-
-        self.theme_button = MDIconButton(
-            icon='cog',
-            pos_hint={'right': 1, 'top': 1},
-            on_release=self.toggle_theme
-        )
-        layout.add_widget(self.theme_button)
 
         title = MDLabel(
             text=titulo,
@@ -266,17 +242,6 @@ class TelaEscolhaNivel(Screen):
     def voltar_tela_inicial(self, instance):
         self.manager.current = self.tela_voltar
 
-    def toggle_theme(self, *args):
-        app = App.get_running_app()
-        theme_cls = app.theme_cls
-        theme_cls.theme_style = "Dark" if theme_cls.theme_style == "Light" else "Light"
-        app.current_theme = theme_cls.theme_style
-        self.bg_image.source = "escuro.png" if app.current_theme == "Dark" else "fundoapp.png"
-
-    def on_pre_enter(self, *args):
-        if hasattr(self, 'bg_image'):
-            app = App.get_running_app()
-            self.bg_image.source = "escuro.png" if app.current_theme == "Dark" else "fundoapp.png"
 
     def create_rodada_button(self, text, center_y, rodadas_value):
         return MDRaisedButton(

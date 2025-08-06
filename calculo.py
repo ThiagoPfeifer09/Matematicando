@@ -39,12 +39,7 @@ class calculoI(MDScreen):
         self.bg_image = Image(source='fundoapp.png', allow_stretch=True, keep_ratio=False)
         layout.add_widget(self.bg_image)
 
-        self.theme_button = MDIconButton(
-            icon='cog',
-            pos_hint={'right': 1, 'top': 1},
-            on_release=self.toggle_theme
-        )
-        layout.add_widget(self.theme_button)
+
 
         # Título
         layout.add_widget(Label(text="MATEMATICANDO", font_size=40, bold=True,
@@ -500,24 +495,6 @@ class calculoI(MDScreen):
     def ir_para_niveis(self, instance):
         self.manager.current = "jogar"
 
-
-    def toggle_theme(self, *args):
-        app = App.get_running_app()
-        theme_cls = app.theme_cls
-        if theme_cls.theme_style == "Light":
-            theme_cls.theme_style = "Dark"
-            app.current_theme = "Dark"
-        else:
-            theme_cls.theme_style = "Light"
-            app.current_theme = "Light"
-
-        # Atualiza o fundo com base no novo tema
-        self.bg_image.source = "escuro.png" if app.current_theme == "Dark" else "fundoapp.png"
-
-    def on_pre_enter(self, *args):
-        app = App.get_running_app()
-        if hasattr(self, 'bg_image'):
-            self.bg_image.source = "escuro.png" if app.current_theme == "Dark" else "fundoapp.png"
 
     def disparar_comemoracao(self):
         layout_principal = self.children[0]

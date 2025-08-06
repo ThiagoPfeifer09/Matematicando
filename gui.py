@@ -19,30 +19,6 @@ class ThemeManagerMixin:
         self.bg_image = Image(source='fundoapp.png', allow_stretch=True, keep_ratio=False)
         layout.add_widget(self.bg_image)
 
-        self.theme_button = MDIconButton(
-            icon="cog",
-            pos_hint={"right": 1, "top": 1},
-            theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            on_release=self.toggle_theme
-        )
-        layout.add_widget(self.theme_button)
-
-    def toggle_theme(self, *args):
-        app = App.get_running_app()
-        theme_cls = app.theme_cls
-        theme_cls.theme_style = "Dark" if theme_cls.theme_style == "Light" else "Light"
-        app.current_theme = theme_cls.theme_style
-        self.bg_image.source = "escuro.png" if theme_cls.theme_style == "Dark" else "fundoapp.png"
-
-    def atualizar_fundos(self):
-        app = App.get_running_app()
-        theme = app.current_theme
-        manager = self.manager if hasattr(self, 'manager') else None
-        if manager:
-            for screen in manager.screens:
-                if hasattr(screen, 'bg_image'):
-                    screen.bg_image.source = "escuro.png" if theme == "Dark" else "fundoapp.png"
 
 
 
