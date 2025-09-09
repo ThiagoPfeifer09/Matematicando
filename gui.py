@@ -10,7 +10,6 @@ from kivy.core.audio import SoundLoader
 from kivymd.uix.card import MDCard
 from kivy.clock import Clock
 from kivy.uix.behaviors import ButtonBehavior
-LabelBase.register(name="Lemonada", fn_regular="arial.ttf")
 LabelBase.register(name="ComicNeue", fn_regular="ComicNeue-Regular.ttf")
 
 # Classe que organiza tema e fundo
@@ -20,17 +19,12 @@ class ThemeManagerMixin:
         layout.add_widget(self.bg_image)
 
 
-
-
-class BotaoImagem(ButtonBehavior, Image):
-    def __init__(self, imagem, on_press_action, **kwargs):
+class ImageButton(ButtonBehavior, Image):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.source = imagem
         self.allow_stretch = True
-        self.keep_ratio = False
-        self.size_hint = (0.4, 0.12)
-        self.on_press_action = on_press_action
-        self.bind(on_release=self.on_press_action)
+        self.keep_ratio = True  # ou False, se quiser preencher total
+
 class TelaInicial(Screen, ThemeManagerMixin):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -54,7 +48,7 @@ class TelaInicial(Screen, ThemeManagerMixin):
             halign="center",
             theme_text_color="Custom",
             text_color=(1, 0.95, 0.8, 1),  # Amarelo claro/quente
-            font_style="H3",
+            font_style="H4",
             font_name="ComicNeue",  # fonte personalizada já usada por você
             size_hint=(1, 1),
             valign="middle",
@@ -64,27 +58,29 @@ class TelaInicial(Screen, ThemeManagerMixin):
         layout.add_widget(self.title_card)
         self.digita_texto(self.title_label, "MATEMATICANDO")
 
-
         # Botão JOGAR
-        botao_jogar = BotaoImagem(
-            imagem="jogar.png",
-            on_press_action=lambda *a: [self.tocar_som_giz(), self.ir_para_selecao()],
+        botao_jogar = ImageButton(
+            source="jogar.png",
+            size_hint=(0.55, 0.25),
+            on_release=lambda *a: [self.tocar_som_giz(), self.ir_para_selecao()],
             pos_hint={"center_x": 0.5, "center_y": 0.65}
         )
         layout.add_widget(botao_jogar)
 
         # Botão INFORMAÇÕES
-        botao_info = BotaoImagem(
-            imagem="infos.png",
-            on_press_action=lambda *a: [self.tocar_som_giz(), self.mostrar_info()],
+        botao_info = ImageButton(
+            source="infos.png",
+            size_hint=(0.55, 0.25),
+            on_release=lambda *a: [self.tocar_som_giz(), self.mostrar_info()],
             pos_hint={"center_x": 0.5, "center_y": 0.45}
         )
         layout.add_widget(botao_info)
 
         # Botão DESENVOLVEDORES
-        botao_devs = BotaoImagem(
-            imagem="devs.png",
-            on_press_action=lambda *a: [self.tocar_som_giz(), self.mostrar_dev()],
+        botao_devs = ImageButton(
+            source="devs.png",
+            size_hint=(0.55, 0.25),
+            on_release=lambda *a: [self.tocar_som_giz(), self.mostrar_dev()],
             pos_hint={"center_x": 0.5, "center_y": 0.25}
         )
         layout.add_widget(botao_devs)
@@ -123,12 +119,6 @@ class TelaInicial(Screen, ThemeManagerMixin):
 
 LabelBase.register(name="ChalkFont", fn_regular="ChalkBoard.ttf")
 
-class ImageButton(ButtonBehavior, Image):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.allow_stretch = True
-        self.keep_ratio = True  # ou False, se quiser preencher total
-#classe do quadro
 class Seleciona_Nivel(Screen, ThemeManagerMixin):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -151,7 +141,7 @@ class Seleciona_Nivel(Screen, ThemeManagerMixin):
 
         btn_primario = ImageButton(
             source="primario.png",
-            size_hint=(0.5, 0.18),
+            size_hint=(0.55, 0.25),
             pos_hint={"center_x": 0.5, "center_y": 0.68},
             on_release=lambda *args: self.ir_para_jogar_p()
         )
@@ -159,7 +149,7 @@ class Seleciona_Nivel(Screen, ThemeManagerMixin):
 
         btn_fundamental = ImageButton(
             source="fundamental.png",
-            size_hint=(0.5, 0.18),
+            size_hint=(0.55, 0.25),
             pos_hint={"center_x": 0.5, "center_y": 0.5},
             on_release=lambda *args: self.ir_para_jogar_f()
         )
@@ -167,16 +157,16 @@ class Seleciona_Nivel(Screen, ThemeManagerMixin):
 
         btn_medio = ImageButton(
             source="medio.png",
-            size_hint=(0.5, 0.18),
+            size_hint=(0.55, 0.25),
             pos_hint={"center_x": 0.5, "center_y": 0.32},
             on_release=lambda *args: self.ir_para_jogar()
         )
         layout.add_widget(btn_medio)
 
-
         back_button = MDIconButton(
             icon='arrow-left',
             pos_hint={'x': 0, 'top': 1},
+            icon_color=(1, 1, 1, 1),
             on_release=self.voltar
         )
         layout.add_widget(back_button)
@@ -236,9 +226,8 @@ class Seleciona_Nivel(Screen, ThemeManagerMixin):
 from jogar import TelaEscolhaNivel, TelaJogar, JogosPrimario, JogosFundamental, JogosMedio
 from calculo import calculoI, TelaFimDeJogo
 from algebra import AlgebraGameScreen, TelaFimAlgebra
+from cruzadinha import TelaCruzadinha
 from fracoes import FracoesGameScreen, TelaFimFracoes
-
-
 class AppGUI:
     def build_gui(self):
         sm = ScreenManager()
@@ -250,10 +239,11 @@ class AppGUI:
         sm.add_widget(TelaEscolhaNivel(name="fundamental", dificuldade="fundamental", titulo="Fundamental II", tela_voltar="jogar"))
         sm.add_widget(TelaEscolhaNivel(name="medio", dificuldade="medio", titulo="Ensino Médio", tela_voltar="jogar"))
         sm.add_widget(calculoI(name="game1"))
-        sm.add_widget(AlgebraGameScreen(name="algebra"))
-        sm.add_widget(TelaFimAlgebra(name="fim_algebra"))
         sm.add_widget(Seleciona_Nivel(name="seleciona"))
         sm.add_widget(TelaFimDeJogo(name="fim_de_jogo"))
-        sm.add_widget(FracoesGameScreen(name="fracoes"))
+        sm.add_widget(AlgebraGameScreen(name="algebra"))
+        sm.add_widget(TelaFimAlgebra(name="fim_algebra"))
+        sm.add_widget(TelaCruzadinha(name="cross"))
         sm.add_widget(TelaFimFracoes(name="fim_fracoes"))
+        sm.add_widget(FracoesGameScreen(name="fracoes"))
         return sm

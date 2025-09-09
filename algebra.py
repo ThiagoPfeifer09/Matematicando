@@ -1,4 +1,3 @@
-import os
 from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen
 from kivymd.app import MDApp
@@ -18,7 +17,7 @@ from kivy.uix.label import Label
 from kivymd.uix.button import MDRaisedButton, MDFloatingActionButton
 from kivy.metrics import dp
 from kivymd.uix.dialog import MDDialog
-from kivy.uix.video import Video # Certifique-se de que Video está importado
+from kivy.uix.video import Video
 
 
 LabelBase.register(name="Arial", fn_regular="arial.ttf")
@@ -63,7 +62,6 @@ class CardBotao(MDCard):
         return super().on_touch_down(touch)
 
 
-
 class AlgebraGameScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -89,14 +87,6 @@ class AlgebraGameScreen(Screen):
         )
         self.layout.add_widget(self.back_button)
 
-        self.theme_button = MDIconButton(
-            icon='cog',
-            pos_hint={'right': 1, 'top': 1},
-            on_release=self.toggle_theme,
-            theme_text_color="Custom",
-            icon_color=(1, 1, 1, 1)
-        )
-        self.layout.add_widget(self.theme_button)
 
         self.main_layout = BoxLayout(
             orientation='vertical',
@@ -109,18 +99,19 @@ class AlgebraGameScreen(Screen):
         self.progresso_label = MDLabel(
             text="Pergunta: 1/10",
             halign="left",
-            font_style="H6",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            font_name="ComicNeue",
+            font_size=dp(14)  # tamanho menor
         )
+
         self.placar_label = MDLabel(
             text="Acertos: 0  Erros: 0",
             halign="right",
-            font_style="H6",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            font_name="ComicNeue",
+            font_size=dp(14)  # mesmo tamanho
         )
         self.top_layout.add_widget(self.progresso_label)
         self.top_layout.add_widget(self.placar_label)
@@ -197,11 +188,21 @@ class AlgebraGameScreen(Screen):
         self.layout.add_widget(self.main_layout)
         self.add_widget(self.layout)
 
-        Clock.schedule_once(lambda dt: self.gerar_equacao(), 0.5)
 
-    def on_pre_enter(self, *args):
-        """Reinicia o estado do jogo sempre que a tela é exibida."""
+    def on_enter(self, *args):
+        """Inicia o jogo e o timer apenas quando a tela entrar."""
+        print("[DEBUG] Entrou na tela, iniciando jogo e timer.")
         self.reiniciar_jogo()
+
+    def on_leave(self, *args):
+        """Cancela todos os timers quando sair da tela."""
+        print("[DEBUG] Saiu da tela, cancelando timers.")
+        if self.timer_event:
+            self.timer_event.cancel()
+            self.timer_event = None
+        if self.tempo_total_event:
+            self.tempo_total_event.cancel()
+            self.tempo_total_event = None
 
     def reiniciar_jogo(self):
         self.pergunta_atual = 1
@@ -359,7 +360,7 @@ class AlgebraGameScreen(Screen):
         minutos, segundos = divmod(int(self.tempo_total), 60)
         tempo_formatado = f"{minutos:02}:{segundos:02}"
 
-        # Pega a tela de fim de jogo e atualiza as estatísticas
+
         fim_screen = self.manager.get_screen("fim_algebra")
         fim_screen.atualizar_stats(
             acertos=self.acertos,
@@ -367,7 +368,6 @@ class AlgebraGameScreen(Screen):
             tempo_total=tempo_formatado,
             dificuldade=self.dificuldade
         )
-        # Finalmente, muda para a tela de fim de jogo
         self.manager.current = "fim_algebra"
 
     def atualizar_timer(self, dt):
@@ -421,31 +421,6 @@ class AlgebraGameScreen(Screen):
         if self.dificuldade.lower() == "fundamental": return random.randint(*facil_range)
         else: return random.randint(*medio_range)
 
-    def toggle_theme(self, *args):
-        app = App.get_running_app()
-        app.theme_cls.theme_style = "Dark" if app.theme_cls.theme_style == "Light" else "Light"
-        self.bg_image.source = "escuro.png" if app.theme_cls.theme_style == "Dark" else "fundoapp.png"
-        self.update_colors_from_theme()
-
-    def update_colors_from_theme(self):
-        """Atualiza as cores dos widgets com base no tema atual."""
-        theme = App.get_running_app().theme_cls
-        # Cor de fundo dos cards principais
-        card_bg = theme.bg_dark if theme.theme_style == "Light" else theme.bg_darkest
-        self.equation_card.md_bg_color = card_bg
-        self.resposta_card.md_bg_color = card_bg
-
-        # Cor do texto nos cards
-        text_color = theme.text_color
-        self.equation_label.color = text_color
-        self.resposta_label.color = text_color
-
-        # Cor dos botões de resposta
-        for layout in [self.botoes_layout_1, self.botoes_layout_2]:
-            for child in layout.children:
-                if isinstance(child, CardBotao):
-                    child.md_bg_color = theme.primary_color
-
     def voltar(self, instance):
         if self.timer_event: self.timer_event.cancel()
         if self.tempo_total_event: self.tempo_total_event.cancel()
@@ -455,37 +430,17 @@ class AlgebraGameScreen(Screen):
         if self.timer_event:
             self.timer_event.cancel()
             self.timer_event = None
-
         self.timer_event = Clock.schedule_interval(self.atualizar_timer, 1)
-        print("[DEBUG] Timer agendado para atualizar_timer")
 
     def mostrar_exemplo_animado(self, *args):
         if self.timer_event:
             self.timer_event.cancel()
             self.timer_event = None
 
-        video_filename = 'eq1.mp4'
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        video_path = os.path.join(base_path, video_filename)
-
-        if not os.path.exists(video_path):
-            error_dialog = MDDialog(
-                title="Erro de Carregamento",
-                text=f"Arquivo {video_filename} não encontrado.",
-                buttons=[
-                    MDRaisedButton(
-                        text="OK",
-                        on_release=lambda x: (error_dialog.dismiss(), self._resume_game_timer())
-                    )
-                ],
-            )
-            error_dialog.open()
-            return
-
         layout = BoxLayout(orientation='vertical', spacing=dp(10), padding=dp(10))
 
         video_widget = Video(
-            source=video_path,
+            source="eq1.mp4",
             state='play',
             allow_stretch=True,
             keep_ratio=True,
@@ -518,7 +473,6 @@ class AlgebraGameScreen(Screen):
         layout.add_widget(btn_fechar)
 
         modal.open()
-
 
 
 class TelaFimAlgebra(MDScreen):

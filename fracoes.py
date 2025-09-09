@@ -1,4 +1,3 @@
-import random
 from kivy.app import App
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.image import Image
@@ -48,7 +47,6 @@ class CardBotao(MDRaisedButton):
 
 
 
-
 # =============================================================================
 # CLASSE PRINCIPAL DO JOGO DE FRAÇÕES
 # =============================================================================
@@ -66,7 +64,7 @@ class FracoesGameScreen(Screen):
         self.bg_image = Image(source='fundoapp.png', allow_stretch=True, keep_ratio=False)
         self.layout.add_widget(self.bg_image)
 
-        self.back_button = MDIconButton(icon='arrow-left', pos_hint={'x': 0, 'top': 1}, on_release=self.voltar)
+        self.back_button = MDIconButton(icon='arrow-left', pos_hint={'x': 0, 'top': 1}, icon_color=(1, 1, 1, 1),on_release=self.voltar)
         self.layout.add_widget(self.back_button)
 
         self.main_layout = BoxLayout(
@@ -79,18 +77,18 @@ class FracoesGameScreen(Screen):
         self.top_layout = BoxLayout(size_hint_y=None, height=dp(40))
 
         self.progresso_label = MDLabel(
-            font_style="H6",
+            font_size=dp(14),  # tamanho menor
             halign="left",
             theme_text_color="Custom",
-            text_color=(53/255, 79/255, 117/255, 1),
+            text_color=(1, 1, 1, 1),
             font_name="ComicNeue"
         )
 
         self.placar_label = MDLabel(
-            font_style="H6",
+            font_size=dp(14),  # tamanho menor
             halign="right",
             theme_text_color="Custom",
-            text_color=(53/255, 79/255, 117/255, 1),
+            text_color=(1, 1, 1, 1),
             font_name="ComicNeue"
         )
 
@@ -375,23 +373,10 @@ class FracoesGameScreen(Screen):
 
     def mostrar_exemplo_animado(self, *args):
         # Caminho do vídeo de exemplo
-        video_filename = 'SomaFracoesTexto.mp4'
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        video_path = os.path.join(base_path, video_filename)
-
-        # Verifica se o vídeo existe
-        if not os.path.exists(video_path):
-            error_dialog = MDDialog(
-                title="Arquivo não encontrado",
-                text=f"O vídeo {video_filename} não foi localizado.",
-                buttons=[MDRaisedButton(text="OK", on_release=lambda x: error_dialog.dismiss())]
-            )
-            error_dialog.open()
-            return
 
         # Cria o layout do vídeo
         video_widget = Video(
-            source=video_path,
+            source='SomaFracoesTexto.mp4',
             state='play',
             allow_stretch=True,
             keep_ratio=True,

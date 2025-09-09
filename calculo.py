@@ -13,6 +13,8 @@ import random
 from kivy.uix.image import Image
 from kivymd.uix.button import MDIconButton
 from kivy.app import App
+from kivymd.uix.textfield import MDTextField
+
 
 class calculoI(MDScreen):
     def __init__(self, **kwargs):
@@ -90,7 +92,7 @@ class calculoI(MDScreen):
         #Botão de responder
         self.responder_button = MDRaisedButton(
             text="Responder",
-            size_hint=(0.1, 0.08),
+            size_hint=(0.05, 0.04),
             font_size="24sp",
             pos_hint={"center_x": 0.75, "center_y": 0.6},
             md_bg_color=(0, 0, 0.8, 1),
@@ -114,8 +116,8 @@ class calculoI(MDScreen):
         layout.add_widget(
             MDRaisedButton(
                 text="Voltar",
-                size_hint=(0.1, 0.06),
-                pos_hint={"center_x": 0.25, "center_y": 0.6},
+                size_hint=(0.035, 0.04),
+                pos_hint={"center_x": 0.12, "center_y": 0.6},
                 font_size="14sp",
                 md_bg_color=(0.5, 0.5, 0.5, 1),
                 text_color=(1, 1, 1, 1),
@@ -132,7 +134,7 @@ class calculoI(MDScreen):
         for level, pos_y, color in zip(range(1, self.nivel_max + 1), [0.425, 0.35, 0.275, 0.2], nivel_cores):
             btn = MDRaisedButton(
                 text=f"Nível {level}",
-                size_hint=(0.1, 0.05),
+                size_hint=(0.07, 0.04),
                 font_size="18sp",
                 pos_hint={"center_x": 0.75, "center_y": pos_y},
                 text_color=(1, 1, 1, 1),
@@ -157,8 +159,8 @@ class calculoI(MDScreen):
         for numberl, pos_y, color in zip(valores_esquerda, [0.3, 0.4, 0.5], nivel_cores):
             btn = MDRaisedButton(
                 text=f"{numberl}",
-                size_hint=(0.1, 0.06),
-                pos_hint={"center_x": 0.25, "center_y": pos_y},
+                size_hint=(0.035, 0.04),
+                pos_hint={"center_x": 0.12, "center_y": pos_y},
                 md_bg_color=(0.2, 0.6, 0.8, 1),
                 text_color=(1, 1, 1, 1),
                 font_size="24sp",
@@ -170,8 +172,8 @@ class calculoI(MDScreen):
         for numberc, pos_y, color in zip(valores_centro, [0.2, 0.3, 0.4,0.5], nivel_cores):
             btn = MDRaisedButton(
                 text=f"{numberc}",
-                size_hint=(0.1, 0.06),
-                pos_hint={"center_x": 0.375, "center_y": pos_y},
+                size_hint=(0.035, 0.04),
+                pos_hint={"center_x": 0.3, "center_y": pos_y},
                 md_bg_color=(0.2, 0.6, 0.8, 1),
                 text_color=(1, 1, 1, 1),
                 font_size="24sp",
@@ -183,7 +185,7 @@ class calculoI(MDScreen):
         for numberr, pos_y, color in zip(valores_direita, [0.3, 0.4, 0.5], nivel_cores):
             btn = MDRaisedButton(
                 text=f"{numberr}",
-                size_hint=(0.1, 0.06),
+                size_hint=(0.035, 0.04),
                 pos_hint={"center_x": 0.5, "center_y": pos_y},
                 md_bg_color=(0.2, 0.6, 0.8, 1),
                 text_color=(1, 1, 1, 1),
@@ -195,7 +197,7 @@ class calculoI(MDScreen):
 
         botao_apagar = MDRaisedButton(
             text="Apagar",
-            size_hint=(0.1, 0.06),
+            size_hint=(0.035, 0.04),
             height=50,
             pos_hint={"center_x": 0.5, "center_y": 0.6},
             font_size="14sp",
@@ -207,8 +209,8 @@ class calculoI(MDScreen):
 
         limpar_button = MDRaisedButton(
             text="Limpar",
-            size_hint=(0.1, 0.06),
-            pos_hint={"center_x": 0.375, "center_y": 0.6},
+            size_hint=(0.035, 0.04),
+            pos_hint={"center_x": 0.3, "center_y": 0.6},
             md_bg_color=(0.2, 0.6, 0.8, 1),
             text_color=(1, 1, 1, 1),
             font_size="14sp",
@@ -218,8 +220,8 @@ class calculoI(MDScreen):
 
         minus_button = MDRaisedButton(
             text="-",
-            size_hint=(0.1, 0.06),
-            pos_hint={"center_x": 0.25, "center_y": 0.2},
+            size_hint=(0.035, 0.04),
+            pos_hint={"center_x": 0.12, "center_y": 0.2},
             md_bg_color=(0.2, 0.6, 0.8, 1),
             text_color=(1, 1, 1, 1),
             font_size="24sp",
@@ -229,7 +231,7 @@ class calculoI(MDScreen):
 
         point_button = MDRaisedButton(
             text=",",
-            size_hint=(0.1, 0.06),
+            size_hint=(0.035, 0.04),
             pos_hint={"center_x": 0.5, "center_y": 0.2},
             md_bg_color=(0.2, 0.6, 0.8, 1),
             text_color=(1, 1, 1, 1),
@@ -241,7 +243,7 @@ class calculoI(MDScreen):
 
         self.timer_label = Label(
             text="00:00:00",
-            font_size=50,
+            font_size=80,
             pos_hint={"center_x": 0.5, "center_y": 0.125},
         )
         layout.add_widget(self.timer_label)
@@ -580,7 +582,6 @@ class calculoI(MDScreen):
 
         self.responder_button.disabled = True
 
-from kivymd.uix.textfield import MDTextField
 
 class TelaFimDeJogo(MDScreen):
     def __init__(self, **kwargs):

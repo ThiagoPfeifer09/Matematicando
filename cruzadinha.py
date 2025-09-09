@@ -14,6 +14,11 @@ import random
 
 LabelBase.register(name="ComicNeue", fn_regular="ComicNeue-Regular.ttf")
 
+# Gerar a matriz aleatoriamente (os espaços dela) e ir encaixando lá
+# 
+#
+#
+
 class CardBotao(MDRaisedButton):
     def __init__(self, texto, on_press_func, **kwargs):
         super().__init__(
@@ -33,10 +38,10 @@ class CardBotao(MDRaisedButton):
             **kwargs
         )
 
+
 class TelaCruzadinha(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.name = "cruzadinha_estilizada"
         self.inputs = []
         self.gabarito = []
 
@@ -73,63 +78,71 @@ class TelaCruzadinha(MDScreen):
 
         self.gerar_cruzadinha()
 
+    def gerar_operacao_inteira(self):
+        op = random.choice(["+", "-", "×", "÷"])
+
+        if op == "+":
+            a = random.randint(2, 15)
+            b = random.randint(2, 15)
+            res = a + b
+
+        elif op == "-":
+            a = random.randint(5, 20)
+            b = random.randint(2, a)  # garante resultado não-negativo
+            res = a - b
+
+        elif op == "×":
+            a = random.randint(2, 10)
+            b = random.randint(2, 10)
+            res = a * b
+
+        elif op == "÷":
+            b = random.randint(2, 10)
+            res = random.randint(2, 10)
+            a = b * res  # garante divisão exata
+            op = "÷"
+
+        return a, b, op, res
+
     def gerar_cruzadinha(self):
         self.inputs.clear()
         self.gabarito.clear()
         self.grid.clear_widgets()
 
+        # layout-base (sem fixar operações)
         layout = [
-            ["VAL", "+", "", "=", "VAL"],
-            ["-", None, "÷", None, "×"],
-            ["", None, "", None, ""],
+            ["VAL", None, "VAL", "=", "VAL"],
+            [None, None, None, None, None],
+            ["VAL", None, "VAL", None, "VAL"],
             ["=", None, "=", None, "="],
-            ["VAL", "+", "VAL", "=", "VAL"]
+            ["VAL", None, "VAL", "=", "VAL"]
         ]
 
         matriz = [[None for _ in range(5)] for _ in range(5)]
 
-        while True:
-            val_40 = random.randint(2, 10)
-            val_22 = random.randint(2, 5)
-            val_04 = val_40 * val_22
+        # primeira linha
+        a, b, op, res = self.gerar_operacao_inteira()
+        matriz[0][0], matriz[0][2], matriz[0][4] = a, b, res
+        layout[0][1] = op
 
-            if val_04 < 20:
-                continue
+        # última linha
+        a, b, op, res = self.gerar_operacao_inteira()
+        matriz[4][0], matriz[4][2], matriz[4][4] = a, b, res
+        layout[4][1] = op
 
-            min_val_00 = 10
-            max_val_00 = val_04 - 10
-            if max_val_00 < min_val_00:
-                continue
+        # coluna do meio (vertical)
+        a, b, op, res = self.gerar_operacao_inteira()
+        matriz[0][2], matriz[2][2], matriz[4][2] = a, b, res
+        layout[1][2] = op
+        layout[3][2] = "="
 
-            val_00 = random.randint(min_val_00, max_val_00)
-            val_02 = val_04 - val_00
-            val_20 = val_00 - val_40
+        # linha do meio (horizontal)
+        a, b, op, res = self.gerar_operacao_inteira()
+        matriz[2][0], matriz[2][2], matriz[2][4] = a, b, res
+        layout[2][1] = op
+        layout[2][3] = "="
 
-            if val_20 < 1:
-                continue
-
-            if val_02 % val_22 != 0:
-                continue
-
-            val_42 = val_02 // val_22
-            val_44 = val_40 + val_42
-
-            if val_44 == 0 or val_04 % val_44 != 0:
-                continue
-
-            val_24 = val_04 // val_44
-            break
-
-        matriz[0][0] = val_00
-        matriz[0][2] = val_02
-        matriz[0][4] = val_04
-        matriz[2][0] = val_20
-        matriz[2][2] = val_22
-        matriz[2][4] = val_24
-        matriz[4][0] = val_40
-        matriz[4][2] = val_42
-        matriz[4][4] = val_44
-
+        # --------- parte visual ----------
         for i in range(5):
             for j in range(5):
                 val = layout[i][j]
@@ -145,53 +158,6 @@ class TelaCruzadinha(MDScreen):
                         size_hint=(1, 1),
                         elevation=0,
                     )
-                elif val == "":
-                    if dado is None:
-                        dado = 0
-                    campo = TextInput(
-                        multiline=False,
-                        halign="center",
-                        font_size=32,
-                        font_name="ComicNeue",
-                        size_hint=(1, 1),
-                        background_color=(1, 1, 1, 0),
-                        foreground_color=(1, 1, 1, 1),
-                        cursor_color=(1, 1, 1, 1),
-                        padding=(10, 10)
-                    )
-                    self.inputs.append(campo)
-                    self.gabarito.append(str(dado))
-
-                    conteudo = MDCard(
-                        md_bg_color=(0, 0, 0, 0),
-                        style="outlined",
-                        line_color=(0, 0, 0, 1),
-                        padding=dp(4),
-                        size_hint=(1, 1),
-                        elevation=0,
-                    )
-                    conteudo.add_widget(campo)
-                elif val in ["+", "-", "×", "÷", "="]:
-                    lbl = MDLabel(
-                        text=val,
-                        halign="center",
-                        valign="middle",
-                        font_style="H6",
-                        font_size="32sp",
-                        font_name="ComicNeue",
-                        theme_text_color="Custom",
-                        text_color=(1, 1, 1, 1),
-                    )
-                    lbl.bind(size=lbl.setter("text_size"))
-                    conteudo = MDCard(
-                        md_bg_color=(0, 0, 0, 0),
-                        style="outlined",
-                        line_color=(0, 0, 0, 1),
-                        padding=dp(4),
-                        size_hint=(1, 1),
-                        elevation=0,
-                    )
-                    conteudo.add_widget(lbl)
                 elif val == "VAL":
                     if dado is None:
                         dado = 0
@@ -216,10 +182,29 @@ class TelaCruzadinha(MDScreen):
                     )
                     conteudo.add_widget(lbl)
 
+                elif val in ["+", "-", "×", "÷", "="]:
+                    lbl = MDLabel(
+                        text=val,
+                        halign="center",
+                        valign="middle",
+                        font_style="H6",
+                        font_size="32sp",
+                        font_name="ComicNeue",
+                        theme_text_color="Custom",
+                        text_color=(1, 1, 1, 1),
+                    )
+                    lbl.bind(size=lbl.setter("text_size"))
+                    conteudo = MDCard(
+                        md_bg_color=(0, 0, 0, 0),
+                        style="outlined",
+                        line_color=(0, 0, 0, 1),
+                        padding=dp(4),
+                        size_hint=(1, 1),
+                        elevation=0,
+                    )
+                    conteudo.add_widget(lbl)
+
                 self.grid.add_widget(conteudo)
-
-        print("Gabarito esperado:", self.gabarito)
-
 
     def verificar_respostas(self, texto):
         pontuacao = 0
@@ -245,12 +230,14 @@ class TelaCruzadinha(MDScreen):
         self.gerar_cruzadinha()
 
     def voltar(self, instance):
-        print("Voltando para o menu")
+        print("Botão voltar clicado (não há navegação aqui).")
 
 
-class AppCruzadinhaMD(MDApp):
+# Para rodar esta tela individualmente
+class TestApp(MDApp):
     def build(self):
-        return TelaCruzadinha()
+        return TelaCruzadinha(name="cross")
+
 
 if __name__ == "__main__":
-    AppCruzadinhaMD().run()
+    TestApp().run()

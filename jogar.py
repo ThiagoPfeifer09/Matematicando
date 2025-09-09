@@ -41,6 +41,7 @@ class TelaJogar(Screen):
         self.back_button = MDIconButton(
             icon='arrow-left',
             pos_hint={'x': 0, 'top': 1},
+            icon_color=(1, 1, 1, 1),
             on_release=self.voltar
         )
         layout.add_widget(self.back_button)
@@ -76,7 +77,7 @@ class TelaJogar(Screen):
                 text=jogo["nome"],
                 halign="center",
                 pos_hint={"center_x": pos["center_x"], "center_y": pos["center_y"] - 0.09},
-                size_hint=(0.15, 0.15),
+                size_hint=(0.16, 0.15),
                 theme_text_color="Custom",
                 text_color=(1, 1, 1, 1)
             )
@@ -104,7 +105,7 @@ class JogosPrimario:
         return [
             {"nome": "Operações", "imagem": "matematicando.png", "tela": "primario"},
             {"nome": "Frações", "imagem": "fracoes.png", "tela": "fracoes"},
-            {"nome": "Sudoku", "imagem": "desafios_logo.png", "tela": "sudoku"},
+            {"nome": "Sudoku", "imagem": "desafios_logo.png", "tela": "a"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
@@ -121,7 +122,7 @@ class JogosFundamental:
             {"nome": "Operações", "imagem": "matematicando.png", "tela": "fundamental"},
             {"nome": "Álgebra", "imagem": "algebra.png", "tela": "algebra"},
             {"nome": "Frações", "imagem": "fracoes.png", "tela": "fracoes"},
-            {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
+            {"nome": "Cruzadinha", "imagem": "cross.png", "tela": "cross"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
@@ -136,8 +137,8 @@ class JogosMedio:
         return [
             {"nome": "Operações", "imagem": "matematicando.png", "tela": "medio"},
             {"nome": "Álgebra", "imagem": "algebra.png", "tela": "algebra"},
-            {"nome": "Frações", "imagem": "abc.png", "tela": "fracoes"},
-            {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
+            {"nome": "Frações", "imagem": "abc.png", "tela": "nada"},
+            {"nome": "Cruzadinha", "imagem": "cross.png", "tela": "cross"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
@@ -165,10 +166,10 @@ class TelaEscolhaNivel(Screen):
             text=titulo,
             halign="center",
             font_style="H4",
+            text_color=(1, 1, 1, 1),
             size_hint=(0.8, None),
             height=50,
             pos_hint={"center_x": 0.5, "top": 0.9},
-            text_color=(1, 0.8, 0, 1),
         )
         layout.add_widget(title)
 
@@ -176,7 +177,8 @@ class TelaEscolhaNivel(Screen):
             text="Quantas rodadas você deseja\n jogar em cada nível?",
             halign="center",
             font_size="20",
-            size_hint=(0.6, None),
+            text_color=(1, 1, 1, 1),
+            size_hint=(0.5, None),
             height=50,
             pos_hint={"center_x": 0.3, "top": 0.8},
         )
@@ -188,13 +190,16 @@ class TelaEscolhaNivel(Screen):
 
         for btn in [self.button_3, self.button_6, self.button_10]:
             btn.pos_hint["center_x"] = 0.3
+            btn.size_hint = (0.5, 0.08)
+            btn.font_size = "50"
             layout.add_widget(btn)
 
         operacoes_text = MDLabel(
             text="Escolha a operação:",
             halign="center",
             font_size="20",
-            size_hint=(0.6, None),
+            text_color=(1, 1, 1, 1),
+            size_hint=(0.5, None),
             height=50,
             pos_hint={"center_x": 0.7, "top": 0.8},
         )
@@ -207,11 +212,13 @@ class TelaEscolhaNivel(Screen):
 
         for btn in [self.op_soma, self.op_subtracao, self.op_multiplicacao, self.op_divisao]:
             btn.pos_hint["center_x"] = 0.7
+            btn.size_hint = (0.5, 0.08)
+            btn.font_size = "50"
             layout.add_widget(btn)
 
         self.calculos_button = MDRaisedButton(
             text="Iniciar Partida",
-            size_hint=(0.3, 0.1),
+            size_hint=(0.3, 0.08),
             height=50,
             font_size="24sp",
             pos_hint={"center_x": 0.5, "center_y": 0.3},
@@ -224,7 +231,7 @@ class TelaEscolhaNivel(Screen):
 
         voltar_button = MDRaisedButton(
             text="Voltar",
-            size_hint=(0.3, 0.1),
+            size_hint=(0.3, 0.08),
             height=50,
             font_size="24sp",
             pos_hint={"center_x": 0.5, "center_y": 0.1},
