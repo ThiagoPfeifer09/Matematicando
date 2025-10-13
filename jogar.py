@@ -7,7 +7,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.metrics import dp
 from kivy.uix.image import Image
 from kivymd.uix.card import MDCard
-from kivymd.uix.fitimage import FitImage
 from kivy.uix.image import Image
 from kivymd.uix.button import MDIconButton
 from kivy.app import App
@@ -41,7 +40,6 @@ class TelaJogar(Screen):
         self.back_button = MDIconButton(
             icon='arrow-left',
             pos_hint={'x': 0, 'top': 1},
-            icon_color=(1, 1, 1, 1),
             on_release=self.voltar
         )
         layout.add_widget(self.back_button)
@@ -106,7 +104,7 @@ class JogosPrimario:
             {"nome": "Operações", "imagem": "matematicando.png", "tela": "primario"},
             {"nome": "Frações", "imagem": "fracoes.png", "tela": "fracoes"},
             {"nome": "Sudoku", "imagem": "desafios_logo.png", "tela": "a"},
-            {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
+            {"nome": "Cruzadinha", "imagem": "cross.png", "tela": "cross_p"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
@@ -122,7 +120,7 @@ class JogosFundamental:
             {"nome": "Operações", "imagem": "matematicando.png", "tela": "fundamental"},
             {"nome": "Álgebra", "imagem": "algebra.png", "tela": "algebra"},
             {"nome": "Frações", "imagem": "fracoes.png", "tela": "fracoes"},
-            {"nome": "Cruzadinha", "imagem": "cross.png", "tela": "cross"},
+            {"nome": "Cruzadinha", "imagem": "cross.png", "tela": "cross_f"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},

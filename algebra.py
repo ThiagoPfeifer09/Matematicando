@@ -82,8 +82,7 @@ class AlgebraGameScreen(Screen):
             icon='arrow-left',
             pos_hint={'x': 0, 'top': 1},
             on_release=self.voltar,
-            theme_text_color="Custom",
-            icon_color=(1, 1, 1, 1)
+            theme_text_color="Custom"
         )
         self.layout.add_widget(self.back_button)
 

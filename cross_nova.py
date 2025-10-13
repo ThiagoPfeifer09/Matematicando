@@ -4,7 +4,6 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.core.window import Window
 from kivy.uix.anchorlayout import AnchorLayout
@@ -12,24 +11,32 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, RoundedRectangle
-
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.button import MDRaisedButton
+from kivymd.app import MDApp
 
 # ---------- GERADOR DE CONTAS COM DIFICULDADE ----------
-def gerar_conta(dificuldade="fundI"):
+def gerar_conta(dificuldade="fundI", subnivel="basico"):
     if dificuldade == "fundI":  # Fundamental I
         ops = ["+", "-"]
-        a = random.randint(1, 20)
-        b = random.randint(1, 20)
+        limites = {"basico": 10, "intermediario": 20, "avancado": 30}
+        max_val = limites[subnivel]
+        a = random.randint(1, max_val)
+        b = random.randint(1, max_val)
 
     elif dificuldade == "fundII":  # Fundamental II
         ops = ["+", "-", "*", "/"]
-        a = random.randint(1, 50)
-        b = random.randint(1, 50)
+        limites = {"basico": 30, "intermediario": 50, "avancado": 80}
+        max_val = limites[subnivel]
+        a = random.randint(1, max_val)
+        b = random.randint(1, max_val)
 
     elif dificuldade == "medio":  # Ensino Médio
         ops = ["+", "-", "*", "/"]
-        a = random.randint(1, 100)
-        b = random.randint(1, 100)
+        limites = {"basico": 80, "intermediario": 100, "avancado": 150}
+        max_val = limites[subnivel]
+        a = random.randint(1, max_val)
+        b = random.randint(1, max_val)
 
     op = random.choice(ops)
 
@@ -67,18 +74,27 @@ def colocar_vertical(grid, x, y, conta):
     return True
 
 
-def gerar_cruzadinha(num_contas=6, dificuldade="fundI"):
+def gerar_cruzadinha(dificuldade="fundI", subnivel="basico"):
+    limites = {
+        "fundI": (5, 7),
+        "fundII": (8, 12),
+        "medio": (12, 18)
+    }
+
+    min_contas, max_contas = limites.get(dificuldade, (3, 3))
+    num_contas = random.randint(min_contas, max_contas)
+
     grid = {}
     contas = []
 
-    conta = gerar_conta(dificuldade)
+    conta = gerar_conta(dificuldade, subnivel)
     colocar_horizontal(grid, 0, 0, conta)
     contas.append(("H", 0, 0, conta))
 
     tentativas = 0
-    while len(contas) < num_contas and tentativas < num_contas*15:
+    while len(contas) < num_contas and tentativas < num_contas * 15:
         tentativas += 1
-        conta = gerar_conta(dificuldade)
+        conta = gerar_conta(dificuldade, subnivel)
         orientacao = random.choice(["H", "V"])
         _, x0, y0, conta_existente = random.choice(contas)
 
@@ -125,7 +141,6 @@ class CelulaFixa(Label):
         self.bg.size = self.size
 
 
-
 class CelulaEntrada(TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -134,26 +149,24 @@ class CelulaEntrada(TextInput):
         self.font_size = 22
         self.multiline = False
         self.input_filter = "int"  # só aceita números
-
-        # Aparência
-        self.foreground_color = (0, 0, 0, 1)   # texto preto
-        self.cursor_color = (0, 0, 0, 1)       # cursor preto
-        self.background_color = (0.9, 0.9, 0.9, 1)  # fundo cinza claro
+        self.foreground_color = (0, 0, 0, 1)
+        self.cursor_color = (0, 0, 0, 1)
+        self.background_color = (0.9, 0.9, 0.9, 1)
 
 
-# ---------- WIDGET CRUZADINHA ----------
 class CruzadinhaWidget(GridLayout):
-    def __init__(self, dificuldade="fundI", **kwargs):
+    def __init__(self, dificuldade="fundI", subnivel="basico", **kwargs):
         super().__init__(**kwargs)
         self.respostas = {}
         self.dificuldade = dificuldade
+        self.subnivel = subnivel
         self.montar()
 
     def montar(self):
         self.clear_widgets()
         self.respostas.clear()
 
-        grid, contas = gerar_cruzadinha(6, self.dificuldade)
+        grid, contas = gerar_cruzadinha(self.dificuldade, self.subnivel)
 
         xs = [x for (x, y) in grid.keys()]
         ys = [y for (x, y) in grid.keys()]
@@ -175,6 +188,7 @@ class CruzadinhaWidget(GridLayout):
                         fixos.add((x0+idx, y0))
                     else:
                         fixos.add((x0, y0+idx))
+
 
         for y in range(max_y, min_y-1, -1):
             for x in range(min_x, max_x+1):
@@ -203,66 +217,183 @@ class CruzadinhaWidget(GridLayout):
                 entrada.background_color = (1, 0, 0, 0.4)  # vermelho
         return acertos, len(self.respostas)
 
+    def revelar_dica(self):
+        if not self.respostas:
+            return False
+
+        posicoes = [pos for pos, (entrada, valor) in self.respostas.items() if entrada.text.strip() == ""]
+        if not posicoes:
+            return False
+
+        x, y = random.choice(posicoes)
+        entrada, valor = self.respostas.pop((x, y))
+        entrada.text = valor
+        entrada.readonly = True
+        entrada.background_color = (0.6, 0.9, 1, 1)
+        return True
+
+    def get_total_celulas(self):
+        return len(self.respostas)
+
+    def get_celulas_vazias(self):
+        return [pos for pos, (entrada, valor) in self.respostas.items() if entrada.text.strip() == ""]
+
 
 # ---------- TELA PRINCIPAL ----------
 class CruzadinhaScreen(Screen):
     def __init__(self, dificuldade, **kwargs):
         super().__init__(**kwargs)
         self.dificuldade = dificuldade
+        self.subnivel = "basico"
+        self.dicas_usadas = 0
+        self.dicas_max = 0
+        self.pontuacao = 0  # <<< sistema de pontos
 
         layout_principal = FloatLayout()
 
-        fundo = Image(
-            source="fundoapp.png",
-            size_hint=(1, 1),
-            allow_stretch=True,
-            keep_ratio=False   # pode simplesmente remover essa linha
-        )
+        # FUNDO
+        fundo = Image(source="fundoapp.png", size_hint=(1, 1), allow_stretch=True, keep_ratio=False)
         layout_principal.add_widget(fundo)
 
         conteudo = BoxLayout(orientation="vertical", spacing=10, padding=10)
         layout_principal.add_widget(conteudo)
 
-        topo = BoxLayout(size_hint=(1, 0.12), padding=10)
-        topo.add_widget(Label(text="✦ Complete a Cruzadinha Matemática ✦",
-                              font_size=28, color=(1, 1, 1, 1), bold=True))
+        # TOPO
+        topo = BoxLayout(size_hint=(1, 0.12), padding=10, spacing=15)
+        topo.add_widget(Label(
+            text="Complete a Cruzadinha Matemática",
+            font_size=28, color=(1, 1, 1, 1), bold=True
+        ))
+
+        # DROPDOWN SUBNÍVEL
+        self.subnivel_button = MDRaisedButton(
+            text="Básico", size_hint=(None, None), size=("160dp", "48dp"),
+            md_bg_color=(1.0, 111/255, 64/255, 1)
+        )
+        menu_items = [
+            {"viewclass": "OneLineListItem", "text": "Básico", "on_release": lambda x="Básico": self.set_subnivel(x)},
+            {"viewclass": "OneLineListItem", "text": "Intermediário", "on_release": lambda x="Intermediário": self.set_subnivel(x)},
+            {"viewclass": "OneLineListItem", "text": "Avançado", "on_release": lambda x="Avançado": self.set_subnivel(x)},
+        ]
+        self.menu = MDDropdownMenu(caller=self.subnivel_button, items=menu_items, width_mult=4)
+        self.subnivel_button.bind(on_release=lambda x: self.menu.open())
+        topo.add_widget(self.subnivel_button)
+
         conteudo.add_widget(topo)
 
+        # MEIO
         meio = AnchorLayout(size_hint=(1, 0.7))
-        self.cruzadinha = CruzadinhaWidget(dificuldade=self.dificuldade)
+        self.cruzadinha = CruzadinhaWidget(dificuldade=self.dificuldade, subnivel=self.subnivel)
         meio.add_widget(self.cruzadinha)
         conteudo.add_widget(meio)
 
+        # BASE
         base = BoxLayout(size_hint=(1, 0.18), spacing=15, padding=15)
 
-        botao_verificar = Button(text="✅ Verificar", font_size=20,
-                                 background_normal="",
-                                 background_color=(0.2, 0.8, 0.2, 1),
-                                 color=(1, 1, 1, 1),
-                                 border=(20, 20, 20, 20))
+        # Botão verificar
+        botao_verificar = MDRaisedButton(
+            text="Verificar", md_bg_color=(0.59, 0.43, 0.91, 1),
+            text_color=(1, 1, 1, 1), font_size=20
+        )
         botao_verificar.bind(on_release=self.verificar)
 
-        botao_novo = Button(text="🔄 Nova Cruzadinha", font_size=20,
-                            background_normal="",
-                            background_color=(0.2, 0.4, 0.9, 1),
-                            color=(1, 1, 1, 1),
-                            border=(20, 20, 20, 20))
+        # Botão nova cruzadinha
+        botao_novo = MDRaisedButton(
+            text="Nova Cruzadinha", md_bg_color=(0.36, 0.8, 0.96, 1),
+            text_color=(1, 1, 1, 1), font_size=20
+        )
         botao_novo.bind(on_release=self.nova_cruzadinha)
 
-        self.resultado = Label(text="", font_size=20, color=(1, 1, 1, 1))
+        # Botão de dica
+        botao_dica = MDRaisedButton(
+            text="Dica 💡", md_bg_color=(1, 0.76, 0.03, 1),
+            text_color=(0, 0, 0, 1), font_size=20
+        )
+        botao_dica.bind(on_release=self.usar_dica)
 
+        # Labels de status
+        self.resultado = Label(text="", font_size=20, color=(1, 1, 1, 1))
+        self.dicas_label = Label(text="Dicas: 0", font_size=18, color=(1, 1, 1, 1))
+        self.pontuacao_label = Label(text="Pontuação: 0", font_size=20, color=(1, 1, 1, 1))  # <<< NOVO
+
+        # Adiciona botões na base
         base.add_widget(botao_verificar)
         base.add_widget(botao_novo)
+        base.add_widget(botao_dica)
+        base.add_widget(self.dicas_label)
         base.add_widget(self.resultado)
+        base.add_widget(self.pontuacao_label)  # <<< NOVO
 
         conteudo.add_widget(base)
         self.add_widget(layout_principal)
+
+        # Inicializa dicas
+        self.nova_cruzadinha()
+
+    def set_subnivel(self, text):
+        self.subnivel_button.text = text
+        self.menu.dismiss()
+        mapa = {"Básico": "basico", "Intermediário": "intermediario", "Avançado": "avancado"}
+        self.subnivel = mapa[text]
+        self.nova_cruzadinha()
 
     def verificar(self, *args):
         acertos, total = self.cruzadinha.verificar()
         self.resultado.text = f"Acertos: {acertos}/{total}"
 
-    def nova_cruzadinha(self, *args):
-        self.cruzadinha.montar()
-        self.resultado.text = ""
+        # Atualiza pontuação
+        pontos_ganhos = acertos * 10
+        pontos_perdidos = (total - acertos) * 5
+        self.pontuacao += pontos_ganhos - pontos_perdidos
+        if self.pontuacao < 0:
+            self.pontuacao = 0
+        self.atualizar_pontuacao()
 
+    def nova_cruzadinha(self, *args):
+        self.cruzadinha.dificuldade = self.dificuldade
+        self.cruzadinha.subnivel = self.subnivel
+        self.cruzadinha.montar()
+
+        total_celulas = self.cruzadinha.get_total_celulas()
+        self.dicas_usadas = 0
+        self.dicas_max = max(0, total_celulas // 2) if total_celulas > 1 else 0
+        self.resultado.text = ""
+        self.atualizar_dicas_label()
+
+    def usar_dica(self, *args):
+        if self.dicas_usadas >= self.dicas_max:
+            self.resultado.text = "Sem dicas restantes!"
+            return
+
+        revelado = self.cruzadinha.revelar_dica()
+        if revelado:
+            self.dicas_usadas += 1
+            self.resultado.text = "Dica usada!"
+            # Desconta pontos por usar dica
+            self.pontuacao -= 5
+            if self.pontuacao < 0:
+                self.pontuacao = 0
+            self.atualizar_pontuacao()
+        else:
+            self.resultado.text = "Nenhuma célula disponível."
+
+        self.atualizar_dicas_label()
+
+    def atualizar_dicas_label(self):
+        self.dicas_label.text = f"Dicas restantes: {self.dicas_max - self.dicas_usadas}"
+
+    def atualizar_pontuacao(self):
+        self.pontuacao_label.text = f"Pontuação: {self.pontuacao}"
+
+
+# ---------- APP ----------
+class CruzadinhaApp(MDApp):
+    def build(self):
+        Window.clearcolor = (0.95, 0.95, 0.95, 1)
+        sm = ScreenManager()
+        sm.add_widget(CruzadinhaScreen(name="cruzadinha", dificuldade="medio"))
+        return sm
+
+
+if __name__ == "__main__":
+    CruzadinhaApp().run()

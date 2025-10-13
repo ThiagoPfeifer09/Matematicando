@@ -10,6 +10,11 @@ from kivy.core.audio import SoundLoader
 from kivymd.uix.card import MDCard
 from kivy.clock import Clock
 from kivy.uix.behaviors import ButtonBehavior
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
+from kivymd.uix.slider import MDSlider
+from kivymd.uix.selectioncontrol import MDSwitch
+from kivymd.uix.boxlayout import MDBoxLayout
 LabelBase.register(name="ComicNeue", fn_regular="ComicNeue-Regular.ttf")
 
 # Classe que organiza tema e fundo
@@ -20,102 +25,106 @@ class ThemeManagerMixin:
 
 
 class ImageButton(ButtonBehavior, Image):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.allow_stretch = True
-        self.keep_ratio = True  # ou False, se quiser preencher total
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            # Define uma zona menor de clique proporcional à imagem visível
+            x, y = touch.pos
+            if (self.x + self.width * 0.1 < x < self.right - self.width * 0.1 and
+                    self.y + self.height * 0.1 < y < self.top - self.height * 0.1):
+                return super().on_touch_down(touch)
+        return False
 
-class TelaInicial(Screen, ThemeManagerMixin):
+# --- Tela inicial ---
+# --- Tela Inicial ---
+class TelaInicial(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = FloatLayout()
         self.setup_background(layout)
 
-        # Título animado com fundo estilizado combinando com o novo fundo roxo/azul
+        # --- Título ---
         self.title_card = MDCard(
             orientation="vertical",
             size_hint=(0.85, None),
             height=110,
-            md_bg_color=(60/255, 20/255, 100/255, 0.65),  # Roxo escuro translúcido
+            md_bg_color=(60 / 255, 20 / 255, 100 / 255, 0.65),
             radius=[24],
             elevation=12,
             padding=[20, 10, 20, 10],
             pos_hint={"center_x": 0.5, "top": 0.95},
         )
-
         self.title_label = MDLabel(
             text="",
             halign="center",
             theme_text_color="Custom",
-            text_color=(1, 0.95, 0.8, 1),  # Amarelo claro/quente
+            text_color=(1, 0.95, 0.8, 1),
             font_style="H4",
-            font_name="ComicNeue",  # fonte personalizada já usada por você
-            size_hint=(1, 1),
             valign="middle",
         )
-
         self.title_card.add_widget(self.title_label)
         layout.add_widget(self.title_card)
         self.digita_texto(self.title_label, "MATEMATICANDO")
 
-        # Botão JOGAR
+        # --- Botão JOGAR ---
         botao_jogar = ImageButton(
             source="jogar.png",
-            size_hint=(0.55, 0.25),
-            on_release=lambda *a: [self.tocar_som_giz(), self.ir_para_selecao()],
-            pos_hint={"center_x": 0.5, "center_y": 0.65}
+            size_hint=(None, None),
+            size=(400, 180),
+            allow_stretch=False,
+            keep_ratio=True,
+            on_release=lambda *a: self.acao_jogar(),
+            pos_hint={"center_x": 0.5, "center_y": 0.6},
         )
         layout.add_widget(botao_jogar)
 
-        # Botão INFORMAÇÕES
-        botao_info = ImageButton(
-            source="infos.png",
-            size_hint=(0.55, 0.25),
-            on_release=lambda *a: [self.tocar_som_giz(), self.mostrar_info()],
-            pos_hint={"center_x": 0.5, "center_y": 0.45}
+        # --- Botão CONTEÚDOS ---
+        botao_conteudos = ImageButton(
+            source="conteudos.png",
+            size_hint=(None, None),
+            size=(400, 180),
+            allow_stretch=False,
+            keep_ratio=True,
+            on_release=lambda *a: self.acao_conteudos(),
+            pos_hint={"center_x": 0.5, "center_y": 0.35},
         )
-        layout.add_widget(botao_info)
+        layout.add_widget(botao_conteudos)
 
-        # Botão DESENVOLVEDORES
-        botao_devs = ImageButton(
-            source="devs.png",
-            size_hint=(0.55, 0.25),
-            on_release=lambda *a: [self.tocar_som_giz(), self.mostrar_dev()],
-            pos_hint={"center_x": 0.5, "center_y": 0.25}
+        # --- Botão CONFIGURAÇÕES (engrenagem) ---
+        self.settings_button = MDIconButton(
+            icon="cog",
+            theme_text_color="Custom",
+            text_color=(1, 1, 1, 1),
+            pos_hint={"right": 0.98, "top": 0.98},
+            on_release=self.abrir_tela_config
         )
-        layout.add_widget(botao_devs)
+        layout.add_widget(self.settings_button)
 
         self.add_widget(layout)
 
     def setup_background(self, layout):
         background = Image(
-            source="fundoapp.png",  # imagem do quadro
+            source="fundoapp.png",
             allow_stretch=True,
             keep_ratio=False,
             size_hint=(1, 1),
-            pos_hint={"center_x": 0.5, "center_y": 0.5}
+            pos_hint={"center_x": 0.5, "center_y": 0.5},
         )
         layout.add_widget(background)
 
     def digita_texto(self, label, texto, i=0):
         if i <= len(texto):
             label.text = texto[:i]
-            Clock.schedule_once(lambda dt: self.digita_texto(label, texto, i+1), 0.05)
+            Clock.schedule_once(lambda dt: self.digita_texto(label, texto, i + 1), 0.05)
 
-    def tocar_som_giz(self):
-        som = SoundLoader.load("giz_riscando.wav")
-        if som:
-            som.play()
-
-    def ir_para_selecao(self):
+    # --- Ações ---
+    def acao_jogar(self):
         self.manager.current = "seleciona"
 
-    def mostrar_dev(self):
-        print("NÃO IMPLEMENTADO AINDA")
+    def acao_conteudos(self):
+        self.manager.current = "conteudos"
 
-    def mostrar_info(self):
-        print("NÃO IMPLEMENTADO AINDA")
-
+    def abrir_tela_config(self, *args):
+        self.manager.current = "config"
 
 LabelBase.register(name="ChalkFont", fn_regular="ChalkBoard.ttf")
 
@@ -164,9 +173,8 @@ class Seleciona_Nivel(Screen, ThemeManagerMixin):
         layout.add_widget(btn_medio)
 
         back_button = MDIconButton(
-            icon='arrow-left',
+            icon='cog',
             pos_hint={'x': 0, 'top': 1},
-            icon_color=(1, 1, 1, 1),
             on_release=self.voltar
         )
         layout.add_widget(back_button)
@@ -219,6 +227,188 @@ class Seleciona_Nivel(Screen, ThemeManagerMixin):
         self.manager.current = "inicial"
 
 
+# --- Tela de Conteúdos ---
+class TelaConteudos(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = FloatLayout()
+
+        background = Image(
+            source="fundoapp.png",
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint=(1, 1)
+        )
+        layout.add_widget(background)
+
+        # Lista de tópicos com suas telas correspondentes
+        topicos = [
+            ("Operações", "meia_tela"),     # já criada
+            ("Álgebra", "algebra_tela"),    # você cria depois
+            ("Geometria", "geometria_tela"),
+            ("Grandezas e Medidas", "grandezas_tela"),
+            ("Probabilidade e Estatística", "estatistica_tela"),
+        ]
+
+        # Criar botões
+        for i, (nome, tela) in enumerate(topicos):
+            btn = MDRaisedButton(
+                text=nome,
+                size_hint=(0.6, 0.1),
+                pos_hint={"center_x": 0.5, "center_y": 0.8 - i*0.15},
+                md_bg_color=(0.3, 0.2, 0.6, 1),
+                text_color=(1, 1, 1, 1),
+                on_release=lambda x, t=tela: self.abrir_topico(t)
+            )
+            layout.add_widget(btn)
+
+        # Botão voltar
+        voltar_btn = MDRaisedButton(
+            text="Voltar",
+            size_hint=(0.3, 0.08),
+            pos_hint={"center_x": 0.5, "y": 0.05},
+            md_bg_color=(0.7, 0.1, 0.2, 1),
+            text_color=(1, 1, 1, 1),
+            on_release=lambda *a: setattr(self.manager, "current", "inicial")
+        )
+        layout.add_widget(voltar_btn)
+
+        self.add_widget(layout)
+
+    def abrir_topico(self, nome_tela):
+        if nome_tela in self.manager.screen_names:
+            self.manager.current = nome_tela
+        else:
+            print(f"⚠️ Tela '{nome_tela}' ainda não foi criada.")
+
+
+
+# --- Tela de Configurações ---
+
+
+
+
+class TelaConfiguracoes(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        layout = FloatLayout()
+
+        # --- Fundo ---
+        background = Image(
+            source="fundoapp.png",
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint=(1, 1),
+            pos_hint={"center_x": 0.5, "center_y": 0.5},
+        )
+        layout.add_widget(background)
+
+        # --- Card central translúcido ---
+        card = MDCard(
+            orientation="vertical",
+            size_hint=(0.85, 0.78),
+            pos_hint={"center_x": 0.5, "center_y": 0.5},
+            radius=[25],
+            md_bg_color=(0.15, 0.05, 0.3, 0.85),
+            padding=[30, 40, 30, 40],
+            spacing=25,
+            elevation=16,
+        )
+
+        conteudo = MDBoxLayout(
+            orientation="vertical",
+            spacing=20,
+        )
+
+        # --- Título ---
+        titulo = MDLabel(
+            text="Configurações",
+            halign="center",
+            theme_text_color="Custom",
+            text_color=(0.95, 0.9, 1, 1),
+            font_style="H5",
+        )
+        conteudo.add_widget(titulo)
+
+        # --- Linha som ---
+        linha_som = MDBoxLayout(orientation="horizontal", spacing=15, adaptive_height=True)
+        linha_som.add_widget(MDLabel(
+            text="Som ativado",
+            halign="left",
+            theme_text_color="Custom",
+            text_color=(0.9, 0.9, 1, 1),
+        ))
+        self.switch_som = MDSwitch(active=True)
+        linha_som.add_widget(self.switch_som)
+        conteudo.add_widget(linha_som)
+
+        # --- Label de volume dinâmico ---
+        self.label_volume = MDLabel(
+            text=f"Volume: 75",
+            halign="center",
+            theme_text_color="Custom",
+            text_color=(0.7, 1, 1, 1),
+            font_style="Subtitle1",
+        )
+        conteudo.add_widget(self.label_volume)
+
+        # --- Slider de volume ---
+        self.slider_volume = MDSlider(
+            min=0,
+            max=100,
+            value=75,
+            color=(0.3, 0.9, 1, 1),
+        )
+        self.slider_volume.bind(value=self.atualizar_volume)
+        conteudo.add_widget(self.slider_volume)
+
+        # --- Botão reportar erro ---
+        botao_reportar = MDRectangleFlatButton(
+            text="Reportar erro",
+            pos_hint={"center_x": 0.5},
+            line_color=(1, 0.6, 0.4, 1),
+            text_color=(1, 0.85, 0.6, 1),
+            on_release=lambda *a: self.animar_botao(botao_reportar),
+        )
+        conteudo.add_widget(botao_reportar)
+
+        # --- Botão desenvolvedores ---
+        botao_dev = MDRectangleFlatButton(
+            text="Ver desenvolvedores",
+            pos_hint={"center_x": 0.5},
+            line_color=(0.5, 0.9, 1, 1),
+            text_color=(0.7, 1, 1, 1),
+            on_release=lambda *a: self.animar_botao(botao_dev),
+        )
+        conteudo.add_widget(botao_dev)
+
+        # --- Botão voltar ---
+        botao_voltar = MDRectangleFlatButton(
+            text="Voltar",
+            pos_hint={"center_x": 0.5},
+            line_color=(0.8, 0.8, 1, 0.7),
+            text_color=(1, 1, 1, 1),
+            on_release=lambda *a: self.voltar_tela_inicial(),
+        )
+        conteudo.add_widget(botao_voltar)
+
+        card.add_widget(conteudo)
+        layout.add_widget(card)
+        self.add_widget(layout)
+
+    # --- Atualiza texto do volume dinamicamente ---
+    def atualizar_volume(self, instance, value):
+        self.label_volume.text = f"Volume: {int(value)}"
+
+    # --- Pequena animação de destaque ao clicar botões ---
+    def animar_botao(self, botao):
+        anim = Animation(opacity=0.6, duration=0.1) + Animation(opacity=1, duration=0.1)
+        anim.start(botao)
+        print(f"Botão clicado: {botao.text}")
+
+    def voltar_tela_inicial(self):
+        self.manager.current = "inicial"
 
 
 
@@ -226,12 +416,17 @@ class Seleciona_Nivel(Screen, ThemeManagerMixin):
 from jogar import TelaEscolhaNivel, TelaJogar, JogosPrimario, JogosFundamental, JogosMedio
 from calculo import calculoI, TelaFimDeJogo
 from algebra import AlgebraGameScreen, TelaFimAlgebra
-from cruzadinha import TelaCruzadinha
+from cruzadinha import CruzadinhaScreen
 from fracoes import FracoesGameScreen, TelaFimFracoes
+from meia_tela import MeiaTela, TelaRepresentacoes, DefinicoesTela
+from meia_algebra import AlgebraTela, AlgebraRepresentacoes, AlgebraDefinicoes
+
 class AppGUI:
     def build_gui(self):
         sm = ScreenManager()
         sm.add_widget(TelaInicial(name="inicial"))
+        sm.add_widget(TelaConteudos(name="conteudos"))
+        sm.add_widget(TelaConfiguracoes(name="config"))
         sm.add_widget(TelaJogar(name="jogar_p", dificuldade="Primário", jogos=JogosPrimario.get()))
         sm.add_widget(TelaJogar(name="jogar_f", dificuldade="Fundamental", jogos=JogosFundamental.get()))
         sm.add_widget(TelaJogar(name="jogar", dificuldade="Médio", jogos=JogosMedio.get()))
@@ -243,7 +438,16 @@ class AppGUI:
         sm.add_widget(TelaFimDeJogo(name="fim_de_jogo"))
         sm.add_widget(AlgebraGameScreen(name="algebra"))
         sm.add_widget(TelaFimAlgebra(name="fim_algebra"))
-        sm.add_widget(TelaCruzadinha(name="cross"))
+        sm.add_widget(CruzadinhaScreen(name="cross_p", dificuldade="fundI"))
+        sm.add_widget(CruzadinhaScreen(name="cross_f", dificuldade="fundII"))
+        sm.add_widget(CruzadinhaScreen(name="cross", dificuldade="medio"))
         sm.add_widget(TelaFimFracoes(name="fim_fracoes"))
         sm.add_widget(FracoesGameScreen(name="fracoes"))
+        sm.add_widget(MeiaTela(name="meia_tela"))
+        sm.add_widget(MeiaTela(name="meia_tela"))
+        sm.add_widget(TelaRepresentacoes(name="representacoes"))
+        sm.add_widget(DefinicoesTela(name="definicoes"))
+        sm.add_widget(AlgebraTela(name="algebra_tela"))
+        sm.add_widget(AlgebraRepresentacoes(name="algebra_representacoes"))
+        sm.add_widget(AlgebraDefinicoes(name="algebra_definicoes"))
         return sm

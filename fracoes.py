@@ -64,7 +64,7 @@ class FracoesGameScreen(Screen):
         self.bg_image = Image(source='fundoapp.png', allow_stretch=True, keep_ratio=False)
         self.layout.add_widget(self.bg_image)
 
-        self.back_button = MDIconButton(icon='arrow-left', pos_hint={'x': 0, 'top': 1}, icon_color=(1, 1, 1, 1),on_release=self.voltar)
+        self.back_button = MDIconButton(icon='arrow-left', pos_hint={'x': 0, 'top': 1},on_release=self.voltar)
         self.layout.add_widget(self.back_button)
 
         self.main_layout = BoxLayout(
