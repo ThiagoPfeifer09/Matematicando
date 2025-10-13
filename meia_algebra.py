@@ -9,13 +9,19 @@ from kivymd.uix.button import MDIconButton
 from kivy.core.text import LabelBase
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.slider import Slider
+from kivy.uix.label import Label
 from kivymd.uix.boxlayout import MDBoxLayout
 import matplotlib.pyplot as plt
 import numpy as np
 from kivy_garden.matplotlib import FigureCanvasKivyAgg
 from kivy.graphics import Color, RoundedRectangle
 from kivymd.uix.button import MDRectangleFlatButton
+import matplotlib.pyplot as plt
+import numpy as np
+import math
 
+from kivy.metrics import dp
+import cmath
 LabelBase.register(name="ComicNeue", fn_regular="ComicNeue-Regular.ttf")
 
 # =================== TELA PRINCIPAL ÁLGEBRA ===================
@@ -197,7 +203,12 @@ class AlgebraDefinicoes(Screen):
 
 
 
-class AlgebraRepresentacoes(Screen):
+from math import sqrt
+import cmath
+from kivymd.uix.screen import MDScreen
+
+
+class AlgebraRepresentacoes(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = FloatLayout()
@@ -220,14 +231,14 @@ class AlgebraRepresentacoes(Screen):
             font_style="H4",
             size_hint=(1, None),
             height=60,
-            pos_hint={"center_x": 0.5, "top": 0.95},
+            pos_hint={"center_x": 0.5, "top": 0.97},
         )
         layout.add_widget(self.title_label)
 
         # --- Botão Voltar ---
         self.btn_voltar = MDIconButton(
             icon="arrow-left",
-            pos_hint={"x": 0.02, "top": 0.95},
+            pos_hint={"x": 0.02, "top": 0.97},
             user_font_size="32sp",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1)
@@ -235,10 +246,10 @@ class AlgebraRepresentacoes(Screen):
         self.btn_voltar.bind(on_release=self.voltar)
         layout.add_widget(self.btn_voltar)
 
-        # --- Card principal de resultado ---
+        # --- CARD 1 (Função e Resultados) ---
         self.card_resultado = MDCard(
-            size_hint=(0.75, 0.22),
-            pos_hint={"center_x": 0.5, "center_y": 0.68},
+            size_hint=(0.9, 0.16),  # 🔽 menor altura
+            pos_hint={"center_x": 0.5, "top": 0.90},  # 🔼 mais para cima
             md_bg_color=(1, 1, 1, 0.9),
             radius=[25],
             elevation=10
@@ -248,70 +259,86 @@ class AlgebraRepresentacoes(Screen):
             halign="center",
             theme_text_color="Custom",
             text_color=(0, 0, 0, 1),
-            font_name="ComicNeue",
             font_style="H6"
         )
         self.card_resultado.add_widget(self.resultado_label)
         layout.add_widget(self.card_resultado)
 
-        # --- Card de Passo a Passo ---
+        # --- CARD 2 (Passo a passo) ---
         self.card_passos = MDCard(
-            size_hint=(0.75, 0.28),
-            pos_hint={"center_x": 0.5, "center_y": 0.38},
-            md_bg_color=(0.98, 0.98, 1, 0.85),
+            size_hint=(0.9, 0.18),  # 🔽 menor
+            pos_hint={"center_x": 0.5, "top": 0.68},  # 🔼 subiu um pouco
+            md_bg_color=(0.97, 0.97, 1, 0.9),
             radius=[25],
             elevation=10,
         )
         self.passos_label = MDLabel(
-            text="🧩 Passo a passo aparecerá aqui",
+            text="Passo a passo aparecerá aqui",
             halign="left",
             valign="top",
             theme_text_color="Custom",
             text_color=(0.1, 0.1, 0.2, 1),
             font_style="Subtitle1",
-            padding=(20, 10)
+            padding=(20, 15)
         )
         self.card_passos.add_widget(self.passos_label)
         layout.add_widget(self.card_passos)
 
-        # --- Sliders compactos (à esquerda) ---
-        self.sliders_layout = BoxLayout(
-            orientation="vertical",
-            spacing=6,
-            size_hint=(0.28, 0.25),
-            pos_hint={"x": 0.05, "y": 0.05}
+        # --- Botões de seleção (1º e 2º grau) ---
+        botoes_layout = BoxLayout(
+            orientation="horizontal",
+            spacing=12,
+            size_hint=(0.32, 0.065),  # 🔽 mais estreitos
+            pos_hint={"x": 0.07, "top": 0.44}  # 🔼 mais acima e à esquerda
+        )
+        btn_1grau = self.criar_botao("Função 1º Grau", lambda: self.selecionar_tipo("1grau"))
+        btn_2grau = self.criar_botao("Função 2º Grau", lambda: self.selecionar_tipo("2grau"))
+        botoes_layout.add_widget(btn_1grau)
+        botoes_layout.add_widget(btn_2grau)
+        layout.add_widget(botoes_layout)
+
+        # --- Parte inferior (sliders à esquerda + gráfico à direita) ---
+        parte_inferior = BoxLayout(
+            orientation="horizontal",
+            spacing=20,
+            size_hint=(0.9, 0.32),  # 🔽 levemente mais baixo
+            pos_hint={"center_x": 0.5, "y": 0.02}  # 🔽 sliders mais para baixo
         )
 
+        # Sliders
+        self.sliders_layout = BoxLayout(
+            orientation="vertical",
+            spacing=5,
+            size_hint=(0.35, 1)
+        )
         self.slider_a, self.label_a = self.criar_slider("a", -5, 5, 1, 1)
         self.slider_b, self.label_b = self.criar_slider("b", -10, 10, 0, 1)
         self.slider_c, self.label_c = self.criar_slider("c", -10, 10, 0, 1)
-
         for label, slider in [(self.label_a, self.slider_a),
                               (self.label_b, self.slider_b),
                               (self.label_c, self.slider_c)]:
             self.sliders_layout.add_widget(label)
             self.sliders_layout.add_widget(slider)
 
-        layout.add_widget(self.sliders_layout)
+        # Gráfico
+        self.fig, self.ax = plt.subplots(figsize=(0.8, 0.8))
+        self.ax.set_facecolor("white")
+        self.graph_canvas = FigureCanvasKivyAgg(self.fig)
+        self.graph_layout = BoxLayout(orientation="vertical", size_hint=(0.65, 1))
+        self.graph_layout.add_widget(self.graph_canvas)
 
-        # --- Botões menores e à direita ---
-        self.botao_layout = BoxLayout(
-            orientation="vertical",
-            spacing=10,
-            size_hint=(0.25, 0.15),
-            pos_hint={"x": 0.7, "y": 0.05}
-        )
-        btn_1grau = self.criar_botao("Função 1º Grau", lambda: self.selecionar_tipo("1grau"))
-        btn_2grau = self.criar_botao("Função 2º Grau", lambda: self.selecionar_tipo("2grau"))
-        self.botao_layout.add_widget(btn_1grau)
-        self.botao_layout.add_widget(btn_2grau)
-        layout.add_widget(self.botao_layout)
+        parte_inferior.add_widget(self.sliders_layout)
+        parte_inferior.add_widget(self.graph_layout)
+        layout.add_widget(parte_inferior)
 
+        # ---
         self.add_widget(layout)
+
+        # Estado inicial
         self.tipo_funcao = None
         self.atualizar_equacao()
 
-    # ------------------- Funções auxiliares -------------------
+    # --- Funções auxiliares ---
     def criar_slider(self, nome, minimo, maximo, valor, passo):
         label = MDLabel(
             text=f"{nome}: {valor}",
@@ -326,18 +353,16 @@ class AlgebraRepresentacoes(Screen):
         return slider, label
 
     def criar_botao(self, texto, callback):
-        botao = MDRectangleFlatButton(
+        return MDRectangleFlatButton(
             text=texto,
             pos_hint={"center_x": 0.5},
             line_color=(0.6, 0.8, 1, 1),
             text_color=(1, 1, 1, 1),
             on_release=lambda *a: callback(),
         )
-        return botao
 
     def selecionar_tipo(self, tipo):
         self.tipo_funcao = tipo
-        # Mostrar/ocultar slider c
         if tipo == "1grau":
             self.slider_c.opacity = 0
             self.label_c.opacity = 0
@@ -346,7 +371,6 @@ class AlgebraRepresentacoes(Screen):
             self.slider_c.opacity = 1
             self.label_c.opacity = 1
             self.slider_c.disabled = False
-
         self.atualizar_equacao()
 
     def atualizar_label(self, label, nome, val):
@@ -356,55 +380,66 @@ class AlgebraRepresentacoes(Screen):
     def atualizar_equacao(self):
         if not self.tipo_funcao:
             self.resultado_label.text = "Escolha 1º ou 2º grau"
-            self.passos_label.text = "🧩 Ajuste os sliders e selecione o tipo de função"
+            self.passos_label.text = "Ajuste os sliders e selecione o tipo de função"
             return
 
         a, b, c = self.slider_a.value, self.slider_b.value, self.slider_c.value
 
+        # --- Atualiza gráfico ---
+        x = np.linspace(-10, 10, 400)
+        y = a * x + b if self.tipo_funcao == "1grau" else a * x**2 + b * x + c
+        self.ax.clear()
+        self.ax.set_facecolor("white")
+        self.ax.plot(x, y, color="blue")
+        self.ax.axhline(0, color="black", linewidth=1)
+        self.ax.axvline(0, color="black", linewidth=1)
+        self.ax.grid(True, linestyle="--", alpha=0.5)
+        self.graph_canvas.draw()
+
+        # --- Atualiza texto e passo a passo ---
         if self.tipo_funcao == "1grau":
             if a != 0:
                 raiz = -b / a
                 self.resultado_label.text = f"f(x) = {a:.1f}x + {b:.1f}\nRaiz: x = {raiz:.2f}"
                 self.passos_label.text = (
-                    "📘 Passo a passo:\n"
-                    f"1️⃣ Equação: {a:.1f}x + {b:.1f} = 0\n"
-                    f"2️⃣ Isolando x → x = -b/a\n"
-                    f"3️⃣ Substituindo: x = -({b:.1f}) / {a:.1f}\n"
-                    f"4️⃣ Resultado: x = {raiz:.2f}"
+                    "Passo a passo:\n"
+                    f"1- Equação: {a:.1f}x + {b:.1f} = 0\n"
+                    f"2- Isolando x → x = -b/a\n"
+                    f"3- Substituindo: x = -({b:.1f}) / {a:.1f}\n"
+                    f"4- Resultado: x = {raiz:.2f}"
                 )
             else:
                 self.resultado_label.text = f"f(x) = {a:.1f}x + {b:.1f}\nRaiz indefinida"
-                self.passos_label.text = "❌ O coeficiente a = 0, não é função de 1º grau."
-
-        elif self.tipo_funcao == "2grau":
+                self.passos_label.text = "O coeficiente a = 0, não é função de 1º grau."
+        else:
             if a != 0:
                 delta = b**2 - 4*a*c
                 xv = -b / (2*a)
                 yv = a*xv**2 + b*xv + c
-
+                raiz_delta = cmath.sqrt(delta)
+                x1 = (-b + raiz_delta) / (2*a)
+                x2 = (-b - raiz_delta) / (2*a)
                 if delta > 0:
-                    x1 = (-b + delta**0.5) / (2*a)
-                    x2 = (-b - delta**0.5) / (2*a)
-                    raiz_texto = f"x₁ = {x1:.2f}, x₂ = {x2:.2f}"
+                    tipo_raiz = "Duas raízes reais:"
+                    raiz_texto = f"x1 = {x1.real:.2f}, x2 = {x2.real:.2f}"
                 elif delta == 0:
-                    x1 = -b / (2*a)
-                    raiz_texto = f"x = {x1:.2f}"
+                    tipo_raiz = "Uma raiz real dupla:"
+                    raiz_texto = f"x = {x1.real:.2f}"
                 else:
-                    raiz_texto = "Raízes complexas"
-
+                    tipo_raiz = "Raízes complexas:"
+                    raiz_texto = f"x1 = {x1.real:.2f} + {x1.imag:.2f}i, x2 = {x2.real:.2f} + {x2.imag:.2f}i"
                 self.resultado_label.text = (
                     f"f(x) = {a:.1f}x² + {b:.1f}x + {c:.1f}\n"
                     f"Ponto de {'mínimo' if a > 0 else 'máximo'}: ({xv:.2f}, {yv:.2f})\n"
                     f"{raiz_texto}"
                 )
-
                 self.passos_label.text = (
-                    "📗 Passo a passo:\n"
-                    f"1️⃣ Equação: {a:.1f}x² + {b:.1f}x + {c:.1f} = 0\n"
-                    f"2️⃣ Δ = b² - 4ac = ({b:.1f})² - 4({a:.1f})({c:.1f}) = {delta:.2f}\n"
-                    f"3️⃣ Raízes: x = (-b ± √Δ) / (2a)\n"
-                    f"4️⃣ Resultado: {raiz_texto}\n"
-                    f"5️⃣ Vértice: ({xv:.2f}, {yv:.2f})"
+                    "Passo a passo:\n"
+                    f"1- Equação: {a:.1f}x² + {b:.1f}x + {c:.1f} = 0\n"
+                    f"2- Δ = b² - 4ac = ({b:.1f})² - 4({a:.1f})({c:.1f}) = {delta:.2f}\n"
+                    f"3- Substituindo: x = (-({b:.1f}) ± √({delta:.2f})) / (2×{a:.1f})\n"
+                    f"4- {tipo_raiz} {raiz_texto}\n"
+                    f"5- Vértice: ({xv:.2f}, {yv:.2f})"
                 )
             else:
                 self.resultado_label.text = "Não é uma função de 2º grau."
