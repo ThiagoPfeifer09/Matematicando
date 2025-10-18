@@ -20,7 +20,6 @@ from kivymd.uix.dialog import MDDialog
 from kivy.uix.video import Video
 import random
 from kivy.core.text import LabelBase
-LabelBase.register(name="ComicNeue", fn_regular="ComicNeue-Regular.ttf")
 
 
 # =============================================================================
@@ -39,7 +38,6 @@ class CardBotao(MDRaisedButton):
                 (0.59, 0.43, 0.91, 1),          # Roxo pastel vibrante
             ]),
             text_color=(1, 1, 1, 1),
-            font_name="ComicNeue",
             elevation=6,
             **kwargs
         )
@@ -80,16 +78,14 @@ class FracoesGameScreen(Screen):
             font_size=dp(14),  # tamanho menor
             halign="left",
             theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            text_color=(1, 1, 1, 1)
         )
 
         self.placar_label = MDLabel(
             font_size=dp(14),  # tamanho menor
             halign="right",
             theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            text_color=(1, 1, 1, 1)
         )
 
         self.top_layout.add_widget(self.progresso_label)
@@ -119,8 +115,7 @@ class FracoesGameScreen(Screen):
             halign="center",
             font_style="H5",
             theme_text_color="Custom",
-            text_color=(53/255, 79/255, 117/255, 1),
-            font_name="ComicNeue"
+            text_color=(53/255, 79/255, 117/255, 1)
         )
         self.resposta_card.add_widget(self.resposta_label)
         self.main_layout.add_widget(self.resposta_card)
@@ -266,14 +261,7 @@ class FracoesGameScreen(Screen):
         operador_img = PILImage.new("RGBA", (60, img1_pil.height), (255, 255, 255, 0))
         draw = ImageDraw.Draw(operador_img)
 
-        try:
-            font = ImageFont.truetype("arial.ttf", 60)
-        except:
-            font = ImageFont.load_default()
-
-        bbox = font.getbbox(op)
-        text_w, text_h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-        draw.text(((60 - text_w) // 2, (img1_pil.height - text_h) // 2), op, fill="black", font=font)
+        draw.text((10, img1_pil.height // 2), op, fill="black")
 
         # Junta as 3 imagens
         largura_total = img1_pil.width + operador_img.width + img2_pil.width
@@ -468,15 +456,6 @@ class TelaFimFracoes(MDScreen):
 
         self.add_widget(layout)
 
-    def on_pre_enter(self, *args):
-        theme = App.get_running_app().theme_cls
-        self.bg_image.source = "escuro.png" if theme.theme_style == "Dark" else "fundoapp.png"
-        self.title_label.color = (1,1,1,1) if theme.theme_style == "Dark" else (0,0,0,1)
-        self.card_stats.md_bg_color = theme.bg_dark
-        for label in self.card_stats.children:
-            if hasattr(label, 'color'): label.color = theme.text_color
-        self.menu_button.md_bg_color = theme.primary_color
-        self.menu_button.theme_text_color = "ContrastParentBackground"
 
     def atualizar_stats(self, acertos, erros, nome_jogo):
         self.acertos_label.text = f"✅ Acertos: {acertos}"

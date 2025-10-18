@@ -19,12 +19,6 @@ from kivy.metrics import dp
 from kivymd.uix.dialog import MDDialog
 from kivy.uix.video import Video
 
-
-LabelBase.register(name="Arial", fn_regular="arial.ttf")
-
-LabelBase.register(name="ComicNeue", fn_regular="ComicNeue-Regular.ttf")
-
-
 CORES_BOTOES = [
     (1.0, 111/255, 64/255, 1),      # Laranja queimado vivo
     (0.36, 0.8, 0.96, 1),           # Azul claro brilhante
@@ -50,8 +44,7 @@ class CardBotao(MDCard):
             halign="center",
             font_style="H5",
             theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            text_color=(1, 1, 1, 1)
         )
         self.add_widget(self.label)
 
@@ -100,7 +93,6 @@ class AlgebraGameScreen(Screen):
             halign="left",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
-            font_name="ComicNeue",
             font_size=dp(14)  # tamanho menor
         )
 
@@ -109,7 +101,6 @@ class AlgebraGameScreen(Screen):
             halign="right",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
-            font_name="ComicNeue",
             font_size=dp(14)  # mesmo tamanho
         )
         self.top_layout.add_widget(self.progresso_label)
@@ -122,8 +113,7 @@ class AlgebraGameScreen(Screen):
             halign="center",
             font_style="H6",
             theme_text_color="Custom",
-            text_color=(1, 0, 0, 1),
-            font_name="ComicNeue"
+            text_color=(1, 0, 0, 1)
         )
         self.progress_bar = MDProgressBar(value=100, max=100)
         self.timer_layout.add_widget(self.timer_label)
@@ -143,8 +133,7 @@ class AlgebraGameScreen(Screen):
             font_style="H4",
             halign="center",
             theme_text_color="Custom",
-            text_color=(53/255, 79/255, 117/255, 1),
-            font_name="ComicNeue"
+            text_color=(53/255, 79/255, 117/255, 1)
         )
         self.equation_card.add_widget(self.equation_label)
         self.main_layout.add_widget(self.equation_card)
@@ -162,8 +151,7 @@ class AlgebraGameScreen(Screen):
             font_style="H5",
             halign="center",
             theme_text_color="Custom",
-            text_color=(1,1,1,1),
-            font_name="ComicNeue"
+            text_color=(1,1,1,1)
         )
         self.resposta_card.add_widget(self.resposta_label)
         self.main_layout.add_widget(self.resposta_card)
@@ -269,7 +257,6 @@ class AlgebraGameScreen(Screen):
 
         self.resposta_correta = x
         self.resposta_label.text = "x = _____"
-        self.resposta_label.font_name = "Arial"
 
         # Gera opções
         opcoes = [x]
@@ -527,28 +514,6 @@ class TelaFimAlgebra(MDScreen):
         layout.add_widget(self.menu_button)
         self.add_widget(layout)
 
-    def on_pre_enter(self, *args):
-        """Atualiza as cores da tela com base no tema ao entrar na tela."""
-        theme = App.get_running_app().theme_cls
-        self.bg_image.source = "escuro.png" if theme.theme_style == "Dark" else "fundoapp.png"
-
-        # Cor do título principal
-        title_color = (1, 1, 1, 1) # Branco para tema escuro
-        if theme.theme_style == "Light":
-            title_color = (0, 0, 0, 1) # Preto para tema claro
-        self.title_label.color = title_color
-
-        # Cor de fundo do card e do texto dentro dele
-        self.card_stats.md_bg_color = theme.bg_dark
-        for label in self.card_stats.children:
-            if hasattr(label, 'color'):
-                label.color = theme.text_color
-
-        # Cor de fundo do botão
-        self.menu_button.md_bg_color = theme.primary_color
-
-        # Define a cor do texto do botão para contrastar com seu fundo
-        self.menu_button.theme_text_color = "ContrastParentBackground"
 
     def atualizar_stats(self, acertos, erros, tempo_total, dificuldade):
         self.acertos_label.text = f"✅ Acertos: {acertos}"

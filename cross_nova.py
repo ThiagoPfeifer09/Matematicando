@@ -5,7 +5,6 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
-from kivy.core.window import Window
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
@@ -385,15 +384,3 @@ class CruzadinhaScreen(Screen):
     def atualizar_pontuacao(self):
         self.pontuacao_label.text = f"Pontuação: {self.pontuacao}"
 
-
-# ---------- APP ----------
-class CruzadinhaApp(MDApp):
-    def build(self):
-        Window.clearcolor = (0.95, 0.95, 0.95, 1)
-        sm = ScreenManager()
-        sm.add_widget(CruzadinhaScreen(name="cruzadinha", dificuldade="medio"))
-        return sm
-
-
-if __name__ == "__main__":
-    CruzadinhaApp().run()

@@ -11,18 +11,14 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.slider import Slider
 from kivy.uix.label import Label
 from kivymd.uix.boxlayout import MDBoxLayout
-import matplotlib.pyplot as plt
-import numpy as np
 from kivy_garden.matplotlib import FigureCanvasKivyAgg
 from kivy.graphics import Color, RoundedRectangle
 from kivymd.uix.button import MDRectangleFlatButton
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-
 from kivy.metrics import dp
 import cmath
-LabelBase.register(name="ComicNeue", fn_regular="ComicNeue-Regular.ttf")
 
 # =================== TELA PRINCIPAL ÁLGEBRA ===================
 class AlgebraTela(Screen):
@@ -46,7 +42,6 @@ class AlgebraTela(Screen):
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
             font_style="H4",
-            font_name="ComicNeue",
             size_hint=(1, None),
             height=50,
             pos_hint={"center_x": 0.5, "top": 0.95},
@@ -64,8 +59,8 @@ class AlgebraTela(Screen):
 
         # Boneco
         boneco = Image(
-            source="boneco.png",
-            size_hint=(0.25, 0.35),
+            source="boneco_algebra.png",
+            size_hint=(0.5, 0.5),
             pos_hint={"center_x": 0.5, "center_y": 0.65}
         )
         layout.add_widget(boneco)
@@ -112,8 +107,7 @@ class AlgebraTela(Screen):
             valign="center",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
-            font_size="18sp",
-            font_name="ComicNeue"
+            font_size="18sp"
         )
         card.add_widget(label)
         card.on_release = lambda *a: [self.tocar_som_giz(), callback()]
@@ -148,10 +142,9 @@ class AlgebraDefinicoes(Screen):
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
             font_style="H4",
-            font_name="ComicNeue",
             size_hint=(1, None),
             height=50,
-            pos_hint={"center_x": 0.5, "top": 0.95},
+            pos_hint={"center_x": 0.5, "top": 0.95}
         )
         layout.add_widget(self.title_label)
 
@@ -190,8 +183,7 @@ class AlgebraDefinicoes(Screen):
             halign="center",
             valign="center",
             theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            text_color=(1, 1, 1, 1)
         ))
         btn_voltar.on_release = lambda *a: self.voltar()
         layout.add_widget(btn_voltar)
@@ -447,4 +439,4 @@ class AlgebraRepresentacoes(MDScreen):
 
     def voltar(self, *args):
         self.manager.transition = SlideTransition(direction="right", duration=0.4)
-        self.manager.current = "meia_tela"
+        self.manager.current = "algebra_tela"

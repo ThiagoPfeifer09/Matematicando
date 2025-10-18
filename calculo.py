@@ -671,10 +671,3 @@ class TelaFimDeJogo(MDScreen):
         enviar_resultado_googleforms(nome, tempo, operacao, rodadas, acertos, erros, nivel)
 
         self.manager.current = "inicial"
-
-    def on_pre_enter(self, *args):
-        app = App.get_running_app()
-        if hasattr(self, 'bg_image'):
-            if not hasattr(app, 'current_theme'):
-                app.current_theme = "Light"
-            self.bg_image.source = "escuro.png" if app.current_theme == "Dark" else "fundoapp.png"

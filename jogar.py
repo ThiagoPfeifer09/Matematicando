@@ -103,7 +103,7 @@ class JogosPrimario:
         return [
             {"nome": "Operações", "imagem": "matematicando.png", "tela": "primario"},
             {"nome": "Frações", "imagem": "fracoes.png", "tela": "fracoes"},
-            {"nome": "Sudoku", "imagem": "desafios_logo.png", "tela": "a"},
+            {"nome": "Algebra", "imagem": "desafios_logo.png", "tela": "a"},
             {"nome": "Cruzadinha", "imagem": "cross.png", "tela": "cross_p"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},

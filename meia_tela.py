@@ -6,10 +6,9 @@ from kivymd.uix.label import MDLabel
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from kivymd.app import MDApp
-
+from functools import partial
 from kivymd.uix.button import MDIconButton
 from kivy.core.text import LabelBase
-LabelBase.register(name="ComicNeue", fn_regular="ComicNeue-Regular.ttf")
 
 # =================== TELA PRINCIPAL ===================
 class MeiaTela(Screen):
@@ -34,7 +33,6 @@ class MeiaTela(Screen):
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
             font_style="H4",
-            font_name="ComicNeue",
             size_hint=(1, None),
             height=50,
             pos_hint={"center_x": 0.5, "top": 0.95},
@@ -101,8 +99,7 @@ class MeiaTela(Screen):
             valign="center",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
-            font_size="18sp",
-            font_name="ComicNeue"
+            font_size="18sp"
         )
         card.add_widget(label)
         card.on_release = lambda *a: [self.tocar_som_giz(), callback()]
@@ -139,7 +136,6 @@ class DefinicoesTela(Screen):
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
             font_style="H4",
-            font_name="ComicNeue",
             size_hint=(1, None),
             height=50,
             pos_hint={"center_x": 0.5, "top": 0.95},
@@ -190,8 +186,7 @@ class DefinicoesTela(Screen):
             halign="center",
             valign="center",
             theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            text_color=(1, 1, 1, 1)
         ))
         btn_voltar.on_release = lambda *a: self.voltar()
         layout.add_widget(btn_voltar)
@@ -240,7 +235,6 @@ class TelaRepresentacoes(Screen):
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
             font_style="H4",
-            font_name="ComicNeue",
             size_hint=(1, None),
             height=60,
             pos_hint={"center_x": 0.5, "top": 0.95},
@@ -259,7 +253,6 @@ class TelaRepresentacoes(Screen):
             halign="center",
             theme_text_color="Custom",
             text_color=(0, 0, 0, 1),
-            font_name="ComicNeue",
             font_style="H5"
         )
         self.card_resultado.add_widget(self.resultado_label)
@@ -271,7 +264,6 @@ class TelaRepresentacoes(Screen):
             halign="center",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
-            font_name="ComicNeue",
             font_style="H6",
             size_hint=(1, None),
             height=40,
@@ -293,8 +285,7 @@ class TelaRepresentacoes(Screen):
             text="Valor 1: 1",
             halign="center",
             theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            text_color=(1, 1, 1, 1)
         )
         self.slider1.bind(value=lambda instance, val: self.update_label(self.label1, val, 1))
         self.sliders_layout.add_widget(self.label1)
@@ -306,8 +297,7 @@ class TelaRepresentacoes(Screen):
             text="Valor 2: 1",
             halign="center",
             theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            text_color=(1, 1, 1, 1)
         )
         self.slider2.bind(value=lambda instance, val: self.update_label(self.label2, val, 2))
         self.sliders_layout.add_widget(self.label2)
@@ -319,8 +309,13 @@ class TelaRepresentacoes(Screen):
         ops = ["+", "-", "×", "÷"]
         self.op_escolhida = "+"
         for i, op in enumerate(ops):
-            btn = self.create_card_button(op, 0.15 + i * 0.2, 0.1, lambda op=op: self.set_op(op))
-            layout.add_widget(btn)
+            btn = self.create_card_button(
+            op,
+            0.15 + i * 0.2,
+            0.1,
+            partial(self.set_op, op)
+            )
+        layout.add_widget(btn)
 
         # Botão voltar
         btn_voltar = self.create_card_button("Voltar", 0.05, 0.02, self.voltar)
@@ -350,8 +345,7 @@ class TelaRepresentacoes(Screen):
             halign="center",
             valign="center",
             theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            font_name="ComicNeue"
+            text_color=(1, 1, 1, 1)
         )
         card.add_widget(label)
         card.bind(on_release=lambda *a: callback())
