@@ -240,8 +240,8 @@ class AlgebraRepresentacoes(MDScreen):
 
         # --- CARD 1 (Função e Resultados) ---
         self.card_resultado = MDCard(
-            size_hint=(0.9, 0.16),  # 🔽 menor altura
-            pos_hint={"center_x": 0.5, "top": 0.90},  # 🔼 mais para cima
+            size_hint=(0.9, 0.16),
+            pos_hint={"center_x": 0.5, "top": 0.90},
             md_bg_color=(1, 1, 1, 0.9),
             radius=[25],
             elevation=10
@@ -258,8 +258,8 @@ class AlgebraRepresentacoes(MDScreen):
 
         # --- CARD 2 (Passo a passo) ---
         self.card_passos = MDCard(
-            size_hint=(0.9, 0.18),  # 🔽 menor
-            pos_hint={"center_x": 0.5, "top": 0.68},  # 🔼 subiu um pouco
+            size_hint=(0.9, 0.18),
+            pos_hint={"center_x": 0.5, "top": 0.68},
             md_bg_color=(0.97, 0.97, 1, 0.9),
             radius=[25],
             elevation=10,
@@ -280,8 +280,8 @@ class AlgebraRepresentacoes(MDScreen):
         botoes_layout = BoxLayout(
             orientation="horizontal",
             spacing=12,
-            size_hint=(0.32, 0.065),  # 🔽 mais estreitos
-            pos_hint={"x": 0.07, "top": 0.44}  # 🔼 mais acima e à esquerda
+            size_hint=(0.32, 0.065),
+            pos_hint={"x": 0.07, "top": 0.44}
         )
         btn_1grau = self.criar_botao("Função 1º Grau", lambda: self.selecionar_tipo("1grau"))
         btn_2grau = self.criar_botao("Função 2º Grau", lambda: self.selecionar_tipo("2grau"))
@@ -293,8 +293,8 @@ class AlgebraRepresentacoes(MDScreen):
         parte_inferior = BoxLayout(
             orientation="horizontal",
             spacing=20,
-            size_hint=(0.9, 0.32),  # 🔽 levemente mais baixo
-            pos_hint={"center_x": 0.5, "y": 0.02}  # 🔽 sliders mais para baixo
+            size_hint=(0.9, 0.32),
+            pos_hint={"center_x": 0.5, "y": 0.02}
         )
 
         # Sliders
@@ -316,6 +316,22 @@ class AlgebraRepresentacoes(MDScreen):
         self.fig, self.ax = plt.subplots(figsize=(0.8, 0.8))
         self.ax.set_facecolor("white")
         self.graph_canvas = FigureCanvasKivyAgg(self.fig)
+
+        # --- NOVOS BOTÕES ACIMA DO GRÁFICO ---
+        botoes_grafico_layout = BoxLayout(
+            orientation="horizontal",
+            spacing=10,
+            size_hint=(0.7, 0.12),
+            pos_hint={"center_x": 0.6, "top": 0.47}
+        )
+        self.btn_raizes = self.criar_botao("Raízes", self.mostrar_raizes)
+        self.btn_interseccao = self.criar_botao("Intersecção Y", self.mostrar_interseccao)
+        self.btn_vertice = self.criar_botao("Vértice", self.mostrar_vertice)
+        botoes_grafico_layout.add_widget(self.btn_raizes)
+        botoes_grafico_layout.add_widget(self.btn_interseccao)
+        botoes_grafico_layout.add_widget(self.btn_vertice)
+        layout.add_widget(botoes_grafico_layout)
+
         self.graph_layout = BoxLayout(orientation="vertical", size_hint=(0.65, 1))
         self.graph_layout.add_widget(self.graph_canvas)
 
@@ -323,11 +339,11 @@ class AlgebraRepresentacoes(MDScreen):
         parte_inferior.add_widget(self.graph_layout)
         layout.add_widget(parte_inferior)
 
-        # ---
         self.add_widget(layout)
 
         # Estado inicial
         self.tipo_funcao = None
+        self.marcadores = []
         self.atualizar_equacao()
 
     # --- Funções auxiliares ---
@@ -347,7 +363,6 @@ class AlgebraRepresentacoes(MDScreen):
     def criar_botao(self, texto, callback):
         return MDRectangleFlatButton(
             text=texto,
-            pos_hint={"center_x": 0.5},
             line_color=(0.6, 0.8, 1, 1),
             text_color=(1, 1, 1, 1),
             on_release=lambda *a: callback(),
@@ -355,6 +370,7 @@ class AlgebraRepresentacoes(MDScreen):
 
     def selecionar_tipo(self, tipo):
         self.tipo_funcao = tipo
+        self.btn_vertice.opacity = 1 if tipo == "2grau" else 0
         if tipo == "1grau":
             self.slider_c.opacity = 0
             self.label_c.opacity = 0
@@ -369,15 +385,39 @@ class AlgebraRepresentacoes(MDScreen):
         label.text = f"{nome}: {val:.1f}"
         self.atualizar_equacao()
 
+    def limpar_marcadores(self):
+        # Garante que a lista exista
+        if not hasattr(self, "marcadores") or self.marcadores is None:
+            self.marcadores = []
+
+        for art in list(self.marcadores):
+            try:
+                # tenta remover normalmente
+                art.remove()
+            except Exception:
+                # Se não der para remover diretamente, tenta remover da lista de linhas do axes (caso seja Line2D)
+                try:
+                    if art in self.ax.lines:
+                        self.ax.lines.remove(art)
+                except Exception:
+                    # ignora qualquer erro residual
+                    pass
+        # limpa a lista e redesenha
+        self.marcadores.clear()
+        try:
+            self.graph_canvas.draw()
+        except Exception:
+            pass
+
+
     def atualizar_equacao(self):
         if not self.tipo_funcao:
             self.resultado_label.text = "Escolha 1º ou 2º grau"
             self.passos_label.text = "Ajuste os sliders e selecione o tipo de função"
             return
-
+        self.limpar_marcadores()
         a, b, c = self.slider_a.value, self.slider_b.value, self.slider_c.value
 
-        # --- Atualiza gráfico ---
         x = np.linspace(-10, 10, 400)
         y = a * x + b if self.tipo_funcao == "1grau" else a * x**2 + b * x + c
         self.ax.clear()
@@ -388,11 +428,14 @@ class AlgebraRepresentacoes(MDScreen):
         self.ax.grid(True, linestyle="--", alpha=0.5)
         self.graph_canvas.draw()
 
-        # --- Atualiza texto e passo a passo ---
+        # Mantém função no título do card
+        func_text = f"f(x) = {a:.1f}x + {b:.1f}" if self.tipo_funcao == "1grau" else f"f(x) = {a:.1f}x² + {b:.1f}x + {c:.1f}"
+
+        # --- Atualiza textos ---
         if self.tipo_funcao == "1grau":
             if a != 0:
                 raiz = -b / a
-                self.resultado_label.text = f"f(x) = {a:.1f}x + {b:.1f}\nRaiz: x = {raiz:.2f}"
+                self.resultado_label.text = f"{func_text} | Raiz: x={raiz:.2f}"
                 self.passos_label.text = (
                     "Passo a passo:\n"
                     f"1- Equação: {a:.1f}x + {b:.1f} = 0\n"
@@ -401,8 +444,8 @@ class AlgebraRepresentacoes(MDScreen):
                     f"4- Resultado: x = {raiz:.2f}"
                 )
             else:
-                self.resultado_label.text = f"f(x) = {a:.1f}x + {b:.1f}\nRaiz indefinida"
-                self.passos_label.text = "O coeficiente a = 0, não é função de 1º grau."
+                self.resultado_label.text = f"{func_text} | Raiz indefinida"
+                self.passos_label.text = "a=0 → não é função de 1º grau."
         else:
             if a != 0:
                 delta = b**2 - 4*a*c
@@ -436,6 +479,43 @@ class AlgebraRepresentacoes(MDScreen):
             else:
                 self.resultado_label.text = "Não é uma função de 2º grau."
                 self.passos_label.text = "⚠️ O coeficiente a = 0, vira função de 1º grau."
+                
+    # --- NOVAS FUNÇÕES PARA MOSTRAR PONTOS ---
+    def mostrar_raizes(self, *args):
+        if not self.tipo_funcao: return
+        self.limpar_marcadores()
+        a, b, c = self.slider_a.value, self.slider_b.value, self.slider_c.value
+        if self.tipo_funcao == "1grau":
+            x = -b / a; y = 0
+            m, = self.ax.plot(x, y, "rv", markersize=10, label="Raiz")
+            self.marcadores.append(m)
+        else:
+            delta = b**2 - 4*a*c
+            if delta < 0: return
+            raiz1 = (-b + np.sqrt(delta)) / (2*a)
+            raiz2 = (-b - np.sqrt(delta)) / (2*a)
+            for r in [raiz1, raiz2]:
+                m, = self.ax.plot(r, 0, "rv", markersize=10)
+                self.marcadores.append(m)
+        self.graph_canvas.draw()
+
+    def mostrar_interseccao(self, *args):
+        if not self.tipo_funcao: return
+        self.limpar_marcadores()
+        a, b, c = self.slider_a.value, self.slider_b.value, self.slider_c.value
+        y = c if self.tipo_funcao == "2grau" else b
+        m, = self.ax.plot(0, y, "bo", markersize=10, label="Intersecção Y")
+        self.marcadores.append(m)
+        self.graph_canvas.draw()
+
+    def mostrar_vertice(self, *args):
+        if self.tipo_funcao != "2grau": return
+        self.limpar_marcadores()
+        a, b, c = self.slider_a.value, self.slider_b.value, self.slider_c.value
+        xv, yv = -b / (2*a), a * (-b / (2*a))**2 + b * (-b / (2*a)) + c
+        m, = self.ax.plot(xv, yv, "go", markersize=10, label="Vértice")
+        self.marcadores.append(m)
+        self.graph_canvas.draw()
 
     def voltar(self, *args):
         self.manager.transition = SlideTransition(direction="right", duration=0.4)
