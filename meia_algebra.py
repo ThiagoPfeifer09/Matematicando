@@ -6,19 +6,12 @@ from kivymd.uix.label import MDLabel
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from kivymd.uix.button import MDIconButton
-from kivy.core.text import LabelBase
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.slider import Slider
-from kivy.uix.label import Label
-from kivymd.uix.boxlayout import MDBoxLayout
 from kivy_garden.matplotlib import FigureCanvasKivyAgg
-from kivy.graphics import Color, RoundedRectangle
 from kivymd.uix.button import MDRectangleFlatButton
 import matplotlib.pyplot as plt
 import numpy as np
-import math
-from kivy.metrics import dp
-import cmath
 
 # =================== TELA PRINCIPAL ÁLGEBRA ===================
 class AlgebraTela(Screen):
@@ -53,6 +46,8 @@ class AlgebraTela(Screen):
         self.back_button = MDIconButton(
             icon='arrow-left',
             pos_hint={'x': 0, 'top': 1},
+            theme_text_color="Custom",
+            text_color=(1, 1, 1, 1),
             on_release=lambda x: self.voltar("conteudos")
         )
         layout.add_widget(self.back_button)
@@ -150,10 +145,10 @@ class AlgebraDefinicoes(Screen):
 
         # Cards de exemplo — substitua com imagens de conceitos algébricos
         imagens = [
-            "img_variaveis.png",
-            "img_expressao.png",
-            "img_equacao.png",
-            "img_termos.png"
+            "incognita.jpeg",
+            "equacao1.jpeg",
+            "exp_alg.jpeg",
+            "term_Alg.jpeg"
         ]
         pos_y = [0.68, 0.68, 0.30, 0.30]
         pos_x = [0.26, 0.74, 0.26, 0.74]
@@ -231,7 +226,7 @@ class AlgebraRepresentacoes(MDScreen):
         self.btn_voltar = MDIconButton(
             icon="arrow-left",
             pos_hint={"x": 0.02, "top": 0.97},
-            user_font_size="32sp",
+            icon_size="32sp",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1)
         )
@@ -278,13 +273,15 @@ class AlgebraRepresentacoes(MDScreen):
 
         # --- Botões de seleção (1º e 2º grau) ---
         botoes_layout = BoxLayout(
-            orientation="horizontal",
-            spacing=12,
-            size_hint=(0.32, 0.065),
-            pos_hint={"x": 0.07, "top": 0.44}
+            orientation="vertical",   # muda de horizontal → vertical
+            spacing=10,
+            size_hint=(0.25, 0.15),   # aumenta a altura para caber os dois
+            pos_hint={"x": 0.07, "top": 0.48}  # leve ajuste na posição vertical
         )
+
         btn_1grau = self.criar_botao("Função 1º Grau", lambda: self.selecionar_tipo("1grau"))
         btn_2grau = self.criar_botao("Função 2º Grau", lambda: self.selecionar_tipo("2grau"))
+
         botoes_layout.add_widget(btn_1grau)
         botoes_layout.add_widget(btn_2grau)
         layout.add_widget(botoes_layout)
@@ -321,8 +318,8 @@ class AlgebraRepresentacoes(MDScreen):
         botoes_grafico_layout = BoxLayout(
             orientation="horizontal",
             spacing=10,
-            size_hint=(0.7, 0.12),
-            pos_hint={"center_x": 0.6, "top": 0.47}
+            size_hint=(0.7, 0.1),
+            pos_hint={"center_x": 0.85, "top": 0.47}
         )
         self.btn_raizes = self.criar_botao("Raízes", self.mostrar_raizes)
         self.btn_interseccao = self.criar_botao("Intersecção Y", self.mostrar_interseccao)
@@ -417,19 +414,20 @@ class AlgebraRepresentacoes(MDScreen):
             return
         self.limpar_marcadores()
         a, b, c = self.slider_a.value, self.slider_b.value, self.slider_c.value
-
+        # Mantém função no título do card
+        func_text = f"f(x) = {a:.1f}x + {b:.1f}" if self.tipo_funcao == "1grau" else f"f(x) = {a:.1f}x² + {b:.1f}x + {c:.1f}"
         x = np.linspace(-10, 10, 400)
         y = a * x + b if self.tipo_funcao == "1grau" else a * x**2 + b * x + c
         self.ax.clear()
         self.ax.set_facecolor("white")
         self.ax.plot(x, y, color="blue")
-        self.ax.axhline(0, color="black", linewidth=1)
-        self.ax.axvline(0, color="black", linewidth=1)
+        self.ax.set_title(func_text)
+        self.ax.axhline(0, color="black", linewidth=2)
+        self.ax.axvline(0, color="black", linewidth=2)
         self.ax.grid(True, linestyle="--", alpha=0.5)
         self.graph_canvas.draw()
 
-        # Mantém função no título do card
-        func_text = f"f(x) = {a:.1f}x + {b:.1f}" if self.tipo_funcao == "1grau" else f"f(x) = {a:.1f}x² + {b:.1f}x + {c:.1f}"
+
 
         # --- Atualiza textos ---
         if self.tipo_funcao == "1grau":
@@ -479,7 +477,7 @@ class AlgebraRepresentacoes(MDScreen):
             else:
                 self.resultado_label.text = "Não é uma função de 2º grau."
                 self.passos_label.text = "⚠️ O coeficiente a = 0, vira função de 1º grau."
-                
+
     # --- NOVAS FUNÇÕES PARA MOSTRAR PONTOS ---
     def mostrar_raizes(self, *args):
         if not self.tipo_funcao: return

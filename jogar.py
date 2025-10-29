@@ -2,10 +2,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.label import MDLabel
 from kivy.uix.screenmanager import Screen
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.metrics import dp
-from kivy.uix.image import Image
 from kivymd.uix.card import MDCard
 from kivy.uix.image import Image
 from kivymd.uix.button import MDIconButton
@@ -103,13 +99,13 @@ class JogosPrimario:
         return [
             {"nome": "Operações", "imagem": "matematicando.png", "tela": "primario"},
             {"nome": "Frações", "imagem": "fracoes.png", "tela": "fracoes"},
-            {"nome": "Algebra", "imagem": "desafios_logo.png", "tela": "a"},
+            {"nome": "Algebra", "imagem": "algebra.png", "tela": "algebra"},
             {"nome": "Cruzadinha", "imagem": "cross.png", "tela": "cross_p"},
-            {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
-            {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
-            {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
-            {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
-            {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
+            {"nome": "Não feito", "imagem": "nada.png", "tela": "nada"},
+            {"nome": "Não feito", "imagem": "nada.png", "tela": "nada"},
+            {"nome": "Não feito", "imagem": "nada.png", "tela": "nada"},
+            {"nome": "Não feito", "imagem": "nada.png", "tela": "nada"},
+            {"nome": "Não feito", "imagem": "nada.png", "tela": "nada"},
         ]
 
 # Tela dos jogos fundamental
@@ -135,7 +131,7 @@ class JogosMedio:
         return [
             {"nome": "Operações", "imagem": "matematicando.png", "tela": "medio"},
             {"nome": "Álgebra", "imagem": "algebra.png", "tela": "algebra"},
-            {"nome": "Frações", "imagem": "abc.png", "tela": "nada"},
+            {"nome": "Frações", "imagem": "fracoes.png", "tela": "fracoes"},
             {"nome": "Cruzadinha", "imagem": "cross.png", "tela": "cross"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
@@ -144,7 +140,6 @@ class JogosMedio:
             {"nome": "Não feito", "imagem": "n_feito.png", "tela": "nada"},
         ]
 #=======================================================================================================================
-
 
 
 #=======================================================================================================================
@@ -210,7 +205,7 @@ class TelaEscolhaNivel(Screen):
 
         for btn in [self.op_soma, self.op_subtracao, self.op_multiplicacao, self.op_divisao]:
             btn.pos_hint["center_x"] = 0.7
-            btn.size_hint = (0.5, 0.08)
+            btn.size_hint = (0.4, 0.06)
             btn.font_size = "50"
             layout.add_widget(btn)
 
@@ -251,7 +246,7 @@ class TelaEscolhaNivel(Screen):
     def create_rodada_button(self, text, center_y, rodadas_value):
         return MDRaisedButton(
             text=text,
-            size_hint=(0.2, 0.05),
+            size_hint=(0.17, 0.03),
             height=50,
             font_size="24sp",
             pos_hint={"center_y": center_y},

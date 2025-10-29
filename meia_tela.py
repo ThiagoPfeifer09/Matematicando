@@ -49,8 +49,8 @@ class MeiaTela(Screen):
 
         # Bonequinho
         boneco = Image(
-            source="boneco.png",
-            size_hint=(0.25, 0.35),
+            source="boneco_operacao.png",
+            size_hint=(0.45, 0.55),
             pos_hint={"center_x": 0.5, "center_y": 0.65}
         )
         layout.add_widget(boneco)
@@ -106,11 +106,9 @@ class MeiaTela(Screen):
         return card
 
     def ir_para(self, tela_nome):
-        self.manager.transition = SlideTransition(direction="left", duration=0.4)
         self.manager.current = tela_nome
 
     def voltar(self, tela_nome):
-        self.manager.transition = SlideTransition(direction="left", duration=0.4)
         self.manager.current = tela_nome
 
 # =================== TELA DEFINIÇÕES ===================
@@ -199,8 +197,7 @@ class DefinicoesTela(Screen):
             Clock.schedule_once(lambda dt: self.digita_texto(label, texto, i+1), 0.05)
 
     def voltar(self):
-        self.manager.transition = SlideTransition(direction="right", duration=0.4)
-        self.manager.current = "meia_tela"
+        self.manager.current = "tela"
 
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.widget import Widget
@@ -402,6 +399,6 @@ class TelaRepresentacoes(Screen):
 
     def voltar(self):
         self.manager.transition = SlideTransition(direction="right", duration=0.4)
-        self.manager.current = "meia_tela"
+        self.manager.current = "tela"
 
 

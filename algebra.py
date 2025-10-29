@@ -1,6 +1,5 @@
 from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen
-from kivymd.app import MDApp
 from kivymd.uix.label import MDLabel
 from kivymd.uix.card import MDCard
 from kivy.uix.boxlayout import BoxLayout
@@ -8,8 +7,6 @@ from kivy.clock import Clock
 from kivymd.uix.progressbar import MDProgressBar
 from kivymd.uix.floatlayout import FloatLayout
 from kivymd.uix.button import MDIconButton
-from kivy.core.text import LabelBase
-from kivy.app import App
 import random
 from kivymd.uix.screen import MDScreen
 from kivy.uix.modalview import ModalView

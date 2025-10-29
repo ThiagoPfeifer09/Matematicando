@@ -14,6 +14,10 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.button import MDRaisedButton
 from kivymd.app import MDApp
 
+from kivymd.uix.button import MDIconButton
+from kivymd.uix.list import OneLineListItem
+
+
 # ---------- GERADOR DE CONTAS COM DIFICULDADE ----------
 def gerar_conta(dificuldade="fundI", subnivel="basico"):
     if dificuldade == "fundI":  # Fundamental I
@@ -264,6 +268,13 @@ class CruzadinhaScreen(Screen):
             font_size=28, color=(1, 1, 1, 1), bold=True
         ))
 
+        self.back_button = MDIconButton(
+            icon='arrow-left',
+            pos_hint={'x': 0, 'top': 1},
+            on_release=lambda x: self.voltar()
+        )
+        topo.add_widget(self.back_button)
+
         # DROPDOWN SUBNÍVEL
         self.subnivel_button = MDRaisedButton(
             text="Básico", size_hint=(None, None), size=("160dp", "48dp"),
@@ -383,4 +394,7 @@ class CruzadinhaScreen(Screen):
 
     def atualizar_pontuacao(self):
         self.pontuacao_label.text = f"Pontuação: {self.pontuacao}"
+
+    def voltar(self):
+        self.manager.current = "seleciona"
 
