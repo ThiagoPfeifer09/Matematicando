@@ -130,8 +130,8 @@ class CelulaFixa(Label):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.size_hint = (None, None)
-        self.size = (44, 44)
-        self.font_size = 22
+        self.size = (64, 64)
+        self.font_size = 28
         self.bold = True
         self.color = (1, 1, 1, 1)
         with self.canvas.before:
@@ -148,8 +148,8 @@ class CelulaEntrada(TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.size_hint = (None, None)
-        self.size = (44, 44)
-        self.font_size = 22
+        self.size = (64, 64)
+        self.font_size = 28
         self.multiline = False
         self.input_filter = "int"  # só aceita números
         self.foreground_color = (0, 0, 0, 1)
@@ -207,8 +207,8 @@ class CruzadinhaWidget(GridLayout):
                     self.add_widget(Widget(size_hint=(None, None), size=(44, 44)))
 
         self.size_hint = (None, None)
-        self.width = self.cols * 46
-        self.height = self.rows * 46
+        self.width = self.cols * 62
+        self.height = self.rows * 62
 
     def verificar(self):
         acertos = 0
@@ -280,14 +280,38 @@ class CruzadinhaScreen(Screen):
             text="Básico", size_hint=(None, None), size=("160dp", "48dp"),
             md_bg_color=(1.0, 111/255, 64/255, 1)
         )
+
         menu_items = [
             {"viewclass": "OneLineListItem", "text": "Básico", "on_release": lambda x="Básico": self.set_subnivel(x)},
             {"viewclass": "OneLineListItem", "text": "Intermediário", "on_release": lambda x="Intermediário": self.set_subnivel(x)},
             {"viewclass": "OneLineListItem", "text": "Avançado", "on_release": lambda x="Avançado": self.set_subnivel(x)},
         ]
+
         self.menu = MDDropdownMenu(caller=self.subnivel_button, items=menu_items, width_mult=4)
-        self.subnivel_button.bind(on_release=lambda x: self.menu.open())
+
+        def abrir_menu(*args):
+            self.menu.open()
+
+            # Espera o menu abrir antes de mover — necessário pois ele é criado dinamicamente
+            from kivy.clock import Clock
+            def reposicionar_menu(dt):
+                try:
+                    menu_container = self.menu.ids.container  # estrutura interna real do menu
+                    menu_x, menu_y = menu_container.pos
+                    menu_w = menu_container.width
+
+                    # Move o menu para a esquerda do botão
+                    novo_x = self.subnivel_button.x - menu_w + self.subnivel_button.width
+                    menu_container.pos = (novo_x, menu_y)
+                except Exception as e:
+                    print("Falha ao reposicionar menu:", e)
+
+            Clock.schedule_once(reposicionar_menu, 0.05)
+
+
+        self.subnivel_button.bind(on_release=abrir_menu)
         topo.add_widget(self.subnivel_button)
+
 
         conteudo.add_widget(topo)
 
@@ -298,42 +322,72 @@ class CruzadinhaScreen(Screen):
         conteudo.add_widget(meio)
 
         # BASE
-        base = BoxLayout(size_hint=(1, 0.18), spacing=15, padding=15)
+        base = BoxLayout(size_hint=(1, 0.18), spacing=20, padding=15)
 
         # Botão verificar
         botao_verificar = MDRaisedButton(
-            text="Verificar", md_bg_color=(0.59, 0.43, 0.91, 1),
-            text_color=(1, 1, 1, 1), font_size=20
+            text="Verificar",
+            md_bg_color=(0.59, 0.43, 0.91, 1),
+            text_color=(1, 1, 1, 1),
+            font_size=22,
+            size_hint=(None, None),
+            size=("200dp", "60dp")
         )
         botao_verificar.bind(on_release=self.verificar)
 
         # Botão nova cruzadinha
         botao_novo = MDRaisedButton(
-            text="Nova Cruzadinha", md_bg_color=(0.36, 0.8, 0.96, 1),
-            text_color=(1, 1, 1, 1), font_size=20
+            text="Nova Cruzadinha",
+            md_bg_color=(0.36, 0.8, 0.96, 1),
+            text_color=(1, 1, 1, 1),
+            font_size=22,
+            size_hint=(None, None),
+            size=("240dp", "60dp")
         )
         botao_novo.bind(on_release=self.nova_cruzadinha)
 
         # Botão de dica
         botao_dica = MDRaisedButton(
-            text="Dica 💡", md_bg_color=(1, 0.76, 0.03, 1),
-            text_color=(0, 0, 0, 1), font_size=20
+            text="Dica",
+            md_bg_color=(1, 0.76, 0.03, 1),
+            text_color=(0, 0, 0, 1),
+            font_size=22,
+            size_hint=(None, None),
+            size=("180dp", "60dp")
         )
         botao_dica.bind(on_release=self.usar_dica)
 
-        # Labels de status
-        self.resultado = Label(text="", font_size=20, color=(1, 1, 1, 1))
-        self.dicas_label = Label(text="Dicas: 0", font_size=18, color=(1, 1, 1, 1))
-        self.pontuacao_label = Label(text="Pontuação: 0", font_size=20, color=(1, 1, 1, 1))  # <<< NOVO
+                # Labels de status
+        self.dicas_label = Label(
+            text="Dicas: 0",
+            font_size=22,
+            color=(1, 1, 1, 1),
+            halign="left",
+            size_hint_x=None,
+            width=200
+        )
+        self.pontuacao_label = Label(
+            text="Pontuação: 0",
+            font_size=24,
+            color=(1, 1, 1, 1),
+            halign="left",
+            size_hint_x=None,
+            width=220
+        )
+        self.resultado = Label(
+            text="",
+            font_size=22,
+            color=(1, 1, 1, 1),
+            halign="center"
+        )
 
-        # Adiciona botões na base
+        # Adiciona labels primeiro, depois os botões
+        base.add_widget(self.dicas_label)
+        base.add_widget(self.pontuacao_label)
+        base.add_widget(self.resultado)
         base.add_widget(botao_verificar)
         base.add_widget(botao_novo)
         base.add_widget(botao_dica)
-        base.add_widget(self.dicas_label)
-        base.add_widget(self.resultado)
-        base.add_widget(self.pontuacao_label)  # <<< NOVO
-
         conteudo.add_widget(base)
         self.add_widget(layout_principal)
 
@@ -346,6 +400,7 @@ class CruzadinhaScreen(Screen):
         mapa = {"Básico": "basico", "Intermediário": "intermediario", "Avançado": "avancado"}
         self.subnivel = mapa[text]
         self.nova_cruzadinha()
+
 
     def verificar(self, *args):
         acertos, total = self.cruzadinha.verificar()

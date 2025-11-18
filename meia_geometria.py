@@ -246,11 +246,11 @@ class GeometriaRepresentacoes(Screen):
             spacing=15,
             padding=[25, 70, 25, 25],
             size_hint=(1, 0.9),
-            pos_hint={"center_x": 0.5, "center_y": 0.45},
+            pos_hint={"center_x": 0.5, "center_y": 0.5},
         )
 
         botoes_box = GridLayout(
-            cols=5,
+            cols=3,
             spacing=10,
             size_hint=(1, 0.18),
             row_force_default=True,

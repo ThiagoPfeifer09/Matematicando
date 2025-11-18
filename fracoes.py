@@ -211,12 +211,7 @@ class FracoesGameScreen(Screen):
 
     def gerar_pergunta(self):
         print(f"[DEBUG] Dificuldade atual: {self.dificuldade}")
-        if self.dificuldade == "Primário":
-            self.gerar_pergunta_primario()
-        elif self.dificuldade == "Fundamental":
-            self.gerar_pergunta_fundamental()
-        else:
-            print("[ERRO] Dificuldade não reconhecida!")
+        self.gerar_pergunta_primario()
 
 
     def gerar_pergunta_fundamental(self):

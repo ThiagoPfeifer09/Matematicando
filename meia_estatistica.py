@@ -6,16 +6,14 @@ from kivymd.uix.card import MDCard
 from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.textfield import MDTextField
-from kivymd.uix.button import MDRaisedButton
-from kivymd.uix.slider import MDSlider
-from kivymd.uix.button import MDIconButton, MDFillRoundFlatIconButton
-from kivymd.uix.menu import MDDropdownMenu
-from kivy.animation import Animation
-from kivy.metrics import dp
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.scrollview import MDScrollView
-# =================== TELA PRINCIPAL ÁLGEBRA ===================
-class GrandezasTela(Screen):
+from kivymd.uix.button import MDIconButton, MDFillRoundFlatIconButton, MDRaisedButton
+from kivy_garden.matplotlib import FigureCanvasKivyAgg
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+
+# =================== TELA PRINCIPAL estatistica ===================
+class EstatisticaTela(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = FloatLayout()
@@ -41,7 +39,7 @@ class GrandezasTela(Screen):
             pos_hint={"center_x": 0.5, "top": 0.95},
         )
         layout.add_widget(self.title_label)
-        self.digita_texto(self.title_label, "GRANDEZAS E MEDIDAS")
+        self.digita_texto(self.title_label, "ESTATISTICA")
 
         # Botão voltar
         self.back_button = MDIconButton(
@@ -55,7 +53,7 @@ class GrandezasTela(Screen):
 
         # Boneco
         boneco = Image(
-            source="Boneco_Grandezas.png",
+            source="Boneco_Estatistica.png",
             size_hint=(0.47, 0.47),
             pos_hint={"center_x": 0.5, "center_y": 0.65}
         )
@@ -65,12 +63,12 @@ class GrandezasTela(Screen):
         btn_representacoes = self.create_card_button(
             "Representações",
             0.3, 0.35,
-            lambda: self.ir_para("grandezas_representacoes")
+            lambda: self.ir_para("estatistica_representacoes")
         )
         btn_definicoes = self.create_card_button(
             "Definições",
             0.3, 0.2,
-            lambda: self.ir_para("grandezas_definicoes")
+            lambda: self.ir_para("estatistica_definicoes")
         )
 
         layout.add_widget(btn_representacoes)
@@ -116,7 +114,7 @@ class GrandezasTela(Screen):
 
 
 # =================== TELA DEFINIÇÕES ===================
-class DefinicoesGrandezas(Screen):
+class DefinicoesEstatistica(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = FloatLayout()
@@ -143,7 +141,7 @@ class DefinicoesGrandezas(Screen):
             pos_hint={"center_x": 0.5, "top": 0.95},
         )
         layout.add_widget(self.title_label)
-        self.digita_texto(self.title_label, "DEFINIÇÕES GEOMETRIA")
+        self.digita_texto(self.title_label, "DEFINIÇÕES ESTATISTICA")
 
         # Lista de imagens (uma para cada operação)
         imagens = [
@@ -202,11 +200,13 @@ class DefinicoesGrandezas(Screen):
 
     def voltar(self):
         self.manager.transition = SlideTransition(direction="right", duration=0.4)
-        self.manager.current = "grandezas_tela"
+        self.manager.current = "estatistica_tela"
 
 
 
-class GrandezasRepresentacoes(Screen):
+
+
+class EstatisticaRepresentacoes(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         root = FloatLayout()
@@ -239,72 +239,27 @@ class GrandezasRepresentacoes(Screen):
             padding=20,
             spacing=10
         )
-
         self.label_titulo = MDLabel(
-            text="Selecione uma grandeza e veja suas representações e conversões:",
+            text="Selecione um conceito estatístico:",
             halign="center",
             theme_text_color="Custom",
             text_color=(0, 0, 0, 1),
             font_style="H6"
         )
-        self.label_detalhe = MDLabel(
-            text="",
+        self.label_explicacao = MDLabel(
+            text="Aqui aparecerá a explicação do conceito escolhido.",
             halign="left",
             theme_text_color="Custom",
             text_color=(0, 0, 0, 1),
             font_style="Subtitle1"
         )
-        self.label_passo_a_passo = MDLabel(
-            text="[i]O passo a passo das conversões aparecerá aqui automaticamente.[/i]",
-            halign="left",
-            theme_text_color="Custom",
-            text_color=(0.1, 0.1, 0.1, 1),
-            font_style="Subtitle1",
-            markup=True
-        )
-
         self.card_explicacao.add_widget(self.label_titulo)
-        self.card_explicacao.add_widget(self.label_detalhe)
-        self.card_explicacao.add_widget(self.label_passo_a_passo)
+        self.card_explicacao.add_widget(self.label_explicacao)
 
         # ================== CARD INTERATIVO ==================
-        interativo_box = BoxLayout(
-            orientation="horizontal",
-            spacing=20,
-            size_hint=(1, 0.45)
-        )
-
-        self.card_imagem = MDCard(
-            orientation="vertical",
-            size_hint=(0.5, 1),
-            radius=[25],
-            elevation=10,
-            md_bg_color=(1, 1, 1, 0.9),
-            padding=15,
-            spacing=10
-        )
-
-        self.imagem_representacao = Image(
-            source="",
-            allow_stretch=True,
-            keep_ratio=True,
-            size_hint=(1, 0.8)
-        )
-
-        self.label_explicacao_figura = MDLabel(
-            text="Selecione uma grandeza para ver uma ilustração e entender melhor o conceito.",
-            halign="center",
-            theme_text_color="Custom",
-            text_color=(0, 0, 0, 1),
-            font_style="Body1"
-        )
-
-        self.card_imagem.add_widget(self.imagem_representacao)
-        self.card_imagem.add_widget(self.label_explicacao_figura)
-
         self.card_interativo = MDCard(
             orientation="vertical",
-            size_hint=(0.5, 1),
+            size_hint=(1, 0.6),
             radius=[25],
             elevation=10,
             md_bg_color=(1, 1, 1, 0.9),
@@ -313,83 +268,71 @@ class GrandezasRepresentacoes(Screen):
         )
 
         self.label_input = MDLabel(
-            text="Digite ou escolha um valor para converter:",
+            text="Digite uma lista de números separados por vírgula:",
             halign="left",
             theme_text_color="Custom",
             text_color=(0, 0, 0, 1)
         )
-        self.input_valor = MDTextField(
-            hint_text="Ex: 5",
+
+        self.input_valores = MDTextField(
+            hint_text="Ex: 2, 4, 5, 8, 10",
             mode="rectangle",
-            helper_text="Valor a converter",
-            helper_text_mode="on_focus",
-            size_hint_x=0.7
+            helper_text="Use vírgulas para separar os valores",
+            helper_text_mode="on_focus"
         )
-        self.input_valor.bind(text=self.atualizar_conversao)
+        self.input_valores.bind(text=self.calcular_estatistica)
 
-        self.slider_valor = MDSlider(
-            min=0,
-            max=100,
-            value=10,
-            step=1,
-            size_hint_x=0.9
+        # === BOTÃO DE GERAR LISTA ALEATÓRIA ===
+        self.btn_gerar_lista = MDRaisedButton(
+            text="🎲 Gerar Lista Aleatória",
+            md_bg_color=(0.2, 0.6, 0.8, 1),
+            text_color=(1, 1, 1, 1),
+            on_release=self.gerar_lista_aleatoria
         )
-        self.slider_valor.bind(value=self.atualizar_slider)
 
-        self.label_resultados = MDLabel(
-            text="Resultados: —",
+        self.label_resultado = MDLabel(
+            text="Resultados aparecerão aqui.",
             halign="left",
             theme_text_color="Custom",
             text_color=(0, 0, 0, 1),
             font_style="Subtitle1"
         )
 
+        self.graph_area = BoxLayout(size_hint=(1, 0.7))
         self.card_interativo.add_widget(self.label_input)
-        self.card_interativo.add_widget(self.input_valor)
-        self.card_interativo.add_widget(self.slider_valor)
-        self.card_interativo.add_widget(self.label_resultados)
+        self.card_interativo.add_widget(self.input_valores)
+        self.card_interativo.add_widget(self.btn_gerar_lista)  # <-- adicionado aqui
+        self.card_interativo.add_widget(self.label_resultado)
+        self.card_interativo.add_widget(self.graph_area)
 
-        interativo_box.add_widget(self.card_imagem)
-        interativo_box.add_widget(self.card_interativo)
-
-        # ================== BOTÕES (3 em cima, 2 embaixo) ==================
-        botoes_geral = BoxLayout(orientation="vertical", spacing=10, size_hint=(1, 0.25))
-        linha1 = BoxLayout(spacing=10)
-        linha2 = BoxLayout(spacing=10)
-
-        grandezas = [
-            ("Comprimento", "regua.png", "O comprimento mede distâncias, como metros e quilômetros."),
-            ("Massa", "balanca.png", "A massa indica a quantidade de matéria em um corpo, medida em kg ou g."),
-            ("Tempo", "relogio.png", "O tempo é medido em segundos, minutos e horas."),
-            ("Volume", "jarra.png", "O volume indica a capacidade de um recipiente, medida em litros."),
-            ("Temperatura", "termometro.png", "A temperatura mede o grau de calor de um corpo, em °C, °F ou K.")
+        # ================== BOTÕES DE CONCEITOS ==================
+        botoes = BoxLayout(spacing=10, size_hint=(1, 0.15))
+        conceitos = [
+            ("Média", "calculator", "A média é a soma dos valores dividida pela quantidade."),
+            ("Mediana", "chart-line", "A mediana é o valor central em uma lista ordenada."),
+            ("Moda", "chart-bar", "A moda é o valor que mais se repete."),
+            ("Amplitude", "arrow-expand", "A amplitude é a diferença entre o maior e o menor valor.")
         ]
 
-        for i, (nome, img, explicacao) in enumerate(grandezas):
+        for nome, icone, explicacao in conceitos:
             btn = MDFillRoundFlatIconButton(
                 text=nome,
-                icon="information",
-                md_bg_color=(0.2, 0.4, 0.7, 1),
+                icon=icone,
+                md_bg_color=(0.2, 0.6, 0.8, 1),
                 text_color=(1, 1, 1, 1),
-                on_release=lambda x, n=nome, i=img, e=explicacao: self.selecionar_grandeza(n, i, e)
+                on_release=lambda x, n=nome, e=explicacao: self.selecionar_conceito(n, e)
             )
-            if i < 3:
-                linha1.add_widget(btn)
-            else:
-                linha2.add_widget(btn)
-
-        botoes_geral.add_widget(linha1)
-        botoes_geral.add_widget(linha2)
+            botoes.add_widget(btn)
 
         # ================== MONTAGEM FINAL ==================
         main_box.add_widget(self.card_explicacao)
-        main_box.add_widget(interativo_box)
-        main_box.add_widget(botoes_geral)
+        main_box.add_widget(self.card_interativo)
+        main_box.add_widget(botoes)
         root.add_widget(main_box)
 
         # ================== TÍTULO E VOLTAR ==================
         titulo = MDLabel(
-            text="Grandezas e Representações",
+            text="Estatística - Representações",
             halign="center",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
@@ -403,102 +346,103 @@ class GrandezasRepresentacoes(Screen):
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
             pos_hint={'x': 0, 'top': 0.98},
-            on_release=lambda x: self.voltar("grandezas_tela")
+            on_release=lambda x: self.voltar("estatistica_tela")
         )
 
         root.add_widget(titulo)
         root.add_widget(back_button)
         self.add_widget(root)
 
-        self.grandeza_atual = None
+        self.conceito_atual = None
 
     # ================== FUNÇÕES ==================
-    def selecionar_grandeza(self, nome, imagem, explicacao):
-        self.grandeza_atual = nome
-        self.imagem_representacao.source = imagem
-        self.label_explicacao_figura.text = explicacao
-        self.label_titulo.text = f"Grandeza: {nome}"
+    def gerar_lista_aleatoria(self, instance):
+        """Gera 10 valores aleatórios entre 1 e 100 e calcula automaticamente."""
+        lista = [random.randint(1, 10) for _ in range(10)]
+        self.input_valores.text = ", ".join(map(str, lista))
+        # cálculo é feito automaticamente pelo bind do campo
 
-        # Mostra todas as conversões partindo de 1 unidade
-        self.mostrar_conversoes_base(nome)
+    def selecionar_conceito(self, nome, explicacao):
+        self.conceito_atual = nome
+        self.label_titulo.text = f"Conceito: {nome}"
+        self.label_explicacao.text = explicacao
 
-    def mostrar_conversoes_base(self, grandeza):
-        """Mostra as equivalências a partir de 1 unidade da grandeza."""
-        if grandeza == "Comprimento":
-            self.label_detalhe.text = (
-                "1 metro (m) = 100 centímetros (cm) = 0,001 quilômetros (km) = 39,37 polegadas (in)"
-            )
-        elif grandeza == "Massa":
-            self.label_detalhe.text = (
-                "1 quilograma (kg) = 1000 gramas (g) = 0,001 toneladas (t) = 2,205 libras (lb)"
-            )
-        elif grandeza == "Tempo":
-            self.label_detalhe.text = (
-                "1 hora (h) = 60 minutos (min) = 3600 segundos (s)"
-            )
-        elif grandeza == "Volume":
-            self.label_detalhe.text = (
-                "1 litro (L) = 1000 mililitros (mL) = 0,001 metros cúbicos (m³)"
-            )
-        elif grandeza == "Temperatura":
-            self.label_detalhe.text = (
-                "1 °C = 33,8 °F = 274,15 K"
-            )
+        texto = self.input_valores.text.strip()
+        if texto:  # já tem valores? recalcula automaticamente
+            self.calcular_estatistica(self.input_valores, texto)
         else:
-            self.label_detalhe.text = ""
+            self.label_resultado.text = "Digite valores ou gere uma lista para calcular."
+            self.graph_area.clear_widgets()
 
-        self.label_passo_a_passo.text = (
-            "[b]Dica:[/b] Agora digite um valor ou mova o controle para ver as conversões dessa grandeza."
-        )
-        self.label_resultados.text = "Resultados: —"
-
-    def atualizar_slider(self, instance, value):
-        self.input_valor.text = str(int(value))
-        self.calcular_resultados(value)
-
-    def atualizar_conversao(self, instance, text):
-        try:
-            valor = float(text)
-            self.slider_valor.value = valor
-            self.calcular_resultados(valor)
-        except ValueError:
-            self.label_resultados.text = "Resultados: —"
-            self.label_passo_a_passo.text = "[i]Digite um valor válido.[/i]"
-
-    def calcular_resultados(self, valor):
-        if not self.grandeza_atual:
-            self.label_resultados.text = "Resultados: —"
-            self.label_passo_a_passo.text = "[i]Selecione uma grandeza primeiro.[/i]"
+    def calcular_estatistica(self, instance, texto):
+        if not self.conceito_atual:
+            self.label_resultado.text = "Selecione um conceito primeiro."
             return
 
-        g = self.grandeza_atual
+        try:
+            valores = [float(x.strip()) for x in texto.split(",") if x.strip()]
+            if not valores:
+                raise ValueError
 
-        if g == "Comprimento":
-            cm = valor * 100
-            km = valor / 1000
-            inch = valor * 39.37
-            self.label_resultados.text = f"{valor} m = {cm:.0f} cm | {km:.3f} km | {inch:.1f} in"
+            resultado = ""
+            linha_valor = None  # <-- valor que será desenhado no gráfico
 
-        elif g == "Massa":
-            g_total = valor * 1000
-            ton = valor / 1000
-            lb = valor * 2.205
-            self.label_resultados.text = f"{valor} kg = {g_total:.0f} g | {ton:.3f} t | {lb:.2f} lb"
+            if self.conceito_atual == "Média":
+                media = np.mean(valores)
+                resultado = f"Média = {media:.2f}"
+                linha_valor = media
 
-        elif g == "Tempo":
-            min = valor * 60
-            sec = valor * 3600
-            self.label_resultados.text = f"{valor} h = {min:.0f} min | {sec:.0f} s"
+            elif self.conceito_atual == "Mediana":
+                mediana = np.median(valores)
+                resultado = f"Mediana = {mediana:.2f}"
+                linha_valor = mediana
 
-        elif g == "Volume":
-            ml = valor * 1000
-            m3 = valor / 1000
-            self.label_resultados.text = f"{valor} L = {ml:.0f} mL | {m3:.3f} m³"
+            elif self.conceito_atual == "Moda":
+                valores_unicos, contagens = np.unique(valores, return_counts=True)
+                moda = valores_unicos[np.argmax(contagens)]
+                resultado = f"Moda = {moda:.2f}"
+                linha_valor = moda
 
-        elif g == "Temperatura":
-            fahrenheit = valor * 9 / 5 + 32
-            kelvin = valor + 273.15
-            self.label_resultados.text = f"{valor} °C = {fahrenheit:.1f} °F | {kelvin:.2f} K"
+            elif self.conceito_atual == "Amplitude":
+                amplitude = np.max(valores) - np.min(valores)
+                resultado = f"Amplitude = {amplitude:.2f}"
+                # aqui, a linha pode mostrar o valor máximo ou mínimo; vamos usar o máximo
+                linha_valor = np.max(valores)
+
+            self.label_resultado.text = f"Resultados: {resultado}"
+            self.plotar_grafico(valores, linha_valor)  # <-- envia o valor da linha
+
+        except ValueError:
+            self.label_resultado.text = "Digite números válidos separados por vírgulas."
+
+
+    def plotar_grafico(self, valores, linha_valor=None):
+        self.graph_area.clear_widgets()
+
+        fig, ax = plt.subplots()
+        ax.bar(range(len(valores)), valores, color="#66b3ff")
+        ax.set_title("Distribuição dos valores")
+        ax.set_xlabel("Índice")
+        ax.set_ylabel("Valor")
+
+        # Calcula limite superior do eixo Y
+        y_max = max(valores)
+        if linha_valor is not None:
+            y_max = max(y_max, linha_valor)
+        ax.set_ylim(0, y_max * 1.30)
+
+        # Desenha a linha horizontal, se houver valor
+        if linha_valor is not None:
+            ax.axhline(y=linha_valor, color='red', linestyle='--', linewidth=2)
+            ax.text(
+                0, linha_valor,
+                f"{self.conceito_atual}: {linha_valor:.2f}",
+                color='red', fontsize=10, va='bottom', ha='left'
+            )
+
+        self.graph_area.add_widget(FigureCanvasKivyAgg(fig))
+
+
 
     def voltar(self, tela_anterior):
         self.manager.current = tela_anterior
