@@ -9,6 +9,7 @@ from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.slider import MDSlider
 from kivy.uix.switch import Switch
+<<<<<<< HEAD
 from kivy.core.text import LabelBase
 import os
 from kivy.metrics import dp
@@ -22,6 +23,9 @@ from kivy.uix.label import Label
 from kivy.uix.modalview import ModalView
 from kivy.animation import Animation
 from kivy.uix.boxlayout import BoxLayout
+=======
+
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
 
 
 CORAL = (1, 0.44, 0.26, 1)   # #FF7043
@@ -59,7 +63,11 @@ class TelaInicial(Screen):
             source="jogar.png",
             size_hint=(None, None),
             size=(400, 180),
+<<<<<<< HEAD
             pos_hint={"center_x": 0.5, "center_y": 0.68},
+=======
+            pos_hint={"center_x": 0.5, "center_y": 0.6},
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         )
         botao_jogar.bind(on_release=lambda *a: self.seleciona_n())
         layout.add_widget(botao_jogar)
@@ -68,11 +76,16 @@ class TelaInicial(Screen):
             source="conteudos.png",
             size_hint=(None, None),
             size=(400, 180),
+<<<<<<< HEAD
             pos_hint={"center_x": 0.5, "center_y": 0.5},
+=======
+            pos_hint={"center_x": 0.5, "center_y": 0.35},
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         )
         botao_conteudos.bind(on_release=lambda *a: self.acao_conteudos())
         layout.add_widget(botao_conteudos)
 
+<<<<<<< HEAD
 
         botao_tutorial = ImageButton(
             source="tutorial.png",
@@ -83,6 +96,9 @@ class TelaInicial(Screen):
         botao_tutorial.bind(on_release=lambda *a: self.acao_tutorial())
         layout.add_widget(botao_tutorial)
 
+=======
+        # Botão configurações (ícone preto)
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         settings_button = MDIconButton(
             icon="cog",
             theme_text_color="Custom",
@@ -110,12 +126,18 @@ class TelaInicial(Screen):
         if self.manager:
             self.manager.current = "conteudos"
 
+<<<<<<< HEAD
     def acao_tutorial(self):
         if self.manager:
             self.manager.current = "tutorial"
 
     def abrir_tela_config(self):
         PainelConfiguracoes().open()
+=======
+    def abrir_tela_config(self, *args):
+        if self.manager:
+            self.manager.current = "config"
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
 
 
 # -------------------------------------------------
@@ -174,6 +196,7 @@ class TelaConteudos(Screen):
         self.manager.current = "inicial"
 
 
+<<<<<<< HEAD
 
 class PainelConfiguracoes(ModalView):
     def __init__(self, **kwargs):
@@ -307,6 +330,107 @@ class PainelConfiguracoes(ModalView):
             return True
         return super().on_touch_down(touch)
 
+=======
+# -------------------------------------------------
+# TELA DE CONFIGURAÇÕES
+# -------------------------------------------------
+class TelaConfiguracoes(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = FloatLayout()
+
+        background = Image(
+            source="fundoapp.png",
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint=(1, 1),
+        )
+        layout.add_widget(background)
+
+        conteudo = MDBoxLayout(
+            orientation="vertical",
+            spacing=25,
+            size_hint=(0.85, 0.78),
+            pos_hint={"center_x": 0.5, "center_y": 0.5},
+            padding=[30, 40, 30, 40],
+        )
+
+        # Título (preto)
+        titulo = MDLabel(
+            text="CONFIGURAÇÕES",
+            halign="center",
+            theme_text_color="Custom",
+            text_color=PRETO,
+            font_style="H5",
+        )
+        conteudo.add_widget(titulo)
+
+        # Linha: som
+        linha_som = MDBoxLayout(orientation="horizontal", spacing=15, adaptive_height=True)
+
+        linha_som.add_widget(
+            MDLabel(
+                text="Som ativado",
+                halign="left",
+                theme_text_color="Custom",
+                text_color=PRETO,
+            )
+        )
+
+        self.switch_som = Switch(active=True)
+        linha_som.add_widget(self.switch_som)
+        conteudo.add_widget(linha_som)
+
+        # Volume texto (preto)
+        self.label_volume = MDLabel(
+            text="Volume: 75",
+            halign="center",
+            theme_text_color="Custom",
+            text_color=PRETO,
+            font_style="Subtitle1",
+        )
+        conteudo.add_widget(self.label_volume)
+
+        # Slider
+        self.slider_volume = MDSlider(min=0, max=100, value=75)
+        self.slider_volume.bind(value=self.atualizar_volume)
+        conteudo.add_widget(self.slider_volume)
+
+        # Botões usando sua paleta
+        botao_reportar = MDRectangleFlatButton(
+            text="Reportar erro",
+            text_color=PRETO,
+            line_color=CORAL,
+            pos_hint={"center_x": 0.5},
+        )
+        conteudo.add_widget(botao_reportar)
+
+        botao_dev = MDRectangleFlatButton(
+            text="Ver desenvolvedores",
+            text_color=PRETO,
+            line_color=LILAS,
+            pos_hint={"center_x": 0.5},
+        )
+        conteudo.add_widget(botao_dev)
+
+        botao_voltar = MDRectangleFlatButton(
+            text="Voltar",
+            text_color=PRETO,
+            line_color=CORAL,
+            pos_hint={"center_x": 0.5},
+        )
+        botao_voltar.bind(on_release=lambda *a: self.voltar_tela_inicial())
+        conteudo.add_widget(botao_voltar)
+
+        layout.add_widget(conteudo)
+        self.add_widget(layout)
+
+    def atualizar_volume(self, instance, value):
+        self.label_volume.text = f"Volume: {int(value)}"
+
+    def voltar_tela_inicial(self):
+        self.manager.current = "inicial"
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
 
 
 from meia_tela import TelaRepresentacoes, MeiaTela, DefinicoesTela
@@ -321,17 +445,26 @@ from meia_algebra import AlgebraTela, AlgebraRepresentacoes, AlgebraDefinicoes
 from sudoku_logic import TelaSudoku
 from fracoes1 import TelaFracoesInfo, TelaFracoesRepresentacoes, TelaFracoesExplicacoes, TelaFracoesPropriedades
 from meia_estatistica import EstatisticaTela, EstatisticaRepresentacoes, DefinicoesEstatistica
+<<<<<<< HEAD
 from teste import TelaTutorial
+=======
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
 # ---------- App Principal ----------
 class TesteApp(MDApp):
     def build(self):
         sm = ScreenManager()
         sm.add_widget(TelaInicial(name="inicial"))
         sm.add_widget(TelaConteudos(name="conteudos"))
+<<<<<<< HEAD
         #sm.add_widget(TelaConfiguracoes(name="config"))
         sm.add_widget(TelaRepresentacoes(name="representacoes"))
         sm.add_widget(MeiaTela(name="tela"))
         sm.add_widget(TelaTutorial(name="tutorial"))
+=======
+        sm.add_widget(TelaConfiguracoes(name="config"))
+        sm.add_widget(TelaRepresentacoes(name="representacoes"))
+        sm.add_widget(MeiaTela(name="tela"))
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         sm.add_widget(DefinicoesTela(name="definicoes"))
         sm.add_widget(GrandezasRepresentacoes(name="grandezas_representacoes"))
         sm.add_widget(GrandezasTela(name="grandezas_tela"))

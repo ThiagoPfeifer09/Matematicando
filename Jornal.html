@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jornal de Cedro Morto — Relatos</title>
+  <style>
+    :root{
+      --bg:#0b0f12; --card:#111417; --muted:#9aa3a8; --accent:#c53030;
+      --glass: rgba(255,255,255,0.03);
+      --radius:12px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      min-height:100%;
+      background:
+        radial-gradient(1000px 400px at 10% 10%, rgba(197,57,57,0.06), transparent 10%),
+        linear-gradient(180deg,#060708 0%, #0e1315 100%);
+      color:#e6eef2;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:28px;
+      box-sizing:border-box;
+    }
+    .wrap{max-width:980px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start}
+    header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:20px}
+    .brand h1{margin:0;font-size:28px;letter-spacing:-0.5px}
+    .brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+    nav a{color:var(--muted);text-decoration:none;margin-left:14px;font-size:14px}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      padding:18px;border-radius:var(--radius);
+      box-shadow:0 6px 18px rgba(0,0,0,0.5);
+    }
+    .main-article{padding:22px}
+    .kicker{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(197,57,57,0.14);color:var(--accent);font-weight:600;font-size:12px;margin-bottom:10px}
+    h2{margin:0 0 8px;font-size:20px}
+    .meta{color:var(--muted);font-size:13px;margin-bottom:14px}
+    p.lead{color:#d6e1e6;line-height:1.6;white-space:pre-line}
+    .buttons{margin-top:16px;display:flex;gap:10px}
+    button.primary{
+      background:linear-gradient(180deg,var(--accent),#9e1b1b);
+      color:white;border:0;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600;
+      box-shadow:0 6px 14px rgba(197,57,57,0.12);
+    }
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:10px 12px;border-radius:8px;cursor:pointer}
+    .aside{display:flex;flex-direction:column;gap:18px}
+    .small-list li{margin:8px 0;color:var(--muted);font-size:14px}
+    .form-row{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    input[type="text"], textarea{
+      width:100%;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:inherit;
+      resize:vertical;font-size:14px;
+    }
+    textarea{min-height:90px}
+    footer{grid-column:1/-1;margin-top:22px;color:var(--muted);font-size:13px;text-align:center}
+    .notice{font-size:13px;color:var(--muted);margin-top:10px}
+    /* mobile */
+    @media (max-width:880px){
+      .wrap{grid-template-columns:1fr; padding:12px}
+      header{flex-direction:column;align-items:flex-start;gap:8px}
+      .aside{order:3}
+    }
+    /* small UI modal */
+    .modal{
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,8,0.6);
+      visibility:hidden;opacity:0;transition:opacity .18s ease, visibility .18s;
+    }
+    .modal.show{visibility:visible;opacity:1}
+    .modal .box{background:var(--card);padding:18px;border-radius:12px;min-width:280px;text-align:center;border:1px solid rgba(255,255,255,0.04)}
+    .close{margin-top:12px;padding:8px 12px;background:transparent;border:1px solid rgba(255,255,255,0.06);border-radius:8px;color:var(--muted);cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>Jornal de Cedro Morto</h1>
+        <p>Relatos policiais e crônicas da região</p>
+      </div>
+      <nav>
+        <a href="#">Início</a>
+        <a href="#noticias">Notícias</a>
+        <a href="#contato">Contato</a>
+      </nav>
+    </header>
+
+    <!-- Main article -->
+    <main class="card main-article" role="main" id="noticias">
+      <span class="kicker">Desaparecimento</span>
+      <h2>Casal de viajantes desaparece após pernoitar em Cedro Morto</h2>
+      <div class="meta">Redação — Segunda-feira, 8 de Abril</div>
+
+      <p class="lead">
+Há uma semana, um casal de viajantes desapareceu após passar por esta vila. Eram pessoas simples, comerciantes que seguiam em direção ao sul. O último registro deles foi na Taverna do Cedro, onde disseram que pernoitariam em Cedro Morto antes de seguir viagem. Desde então, ninguém mais os viu.
+
+As autoridades próximas, com poucos recursos e pouca vontade de enviar homens para a região isolada, anunciaram uma pequena recompensa por informações que levem aos desaparecidos. Testemunhas dizem que o dono da taverna foi a última pessoa a ver o casal. Qualquer informação pode ser vital.
+      </p>
+
+      <div class="buttons">
+        <button class="primary" id="btnDenunciar">Denunciar / Informar</button>
+        <button class="ghost" id="btnLerMais">Ler mais</button>
+      </div>
+
+      <hr style="margin:18px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)">
+
+      <h3>Outros relatos relacionados</h3>
+      <ul style="margin-top:10px;line-height:1.6;color:var(--muted)">
+        <li><strong>Moradores em alerta:</strong> noites silenciosas e sussurros nos campos — Quarta-feira, 10 de Abril</li>
+        <li><strong>Rastros perto do moinho:</strong> um caçador afirma ter encontrado marcas de sangue — Relato não confirmado</li>
+      </ul>
+
+      <div style="margin-top:16px" class="card">
+        <strong>Envie uma pista (anônima)</strong>
+        <p class="notice">Se viu algo, conte-nos — este envio é apenas local (simulação). Não gravamos nada em servidor.</p>
+        <form id="relatoForm" style="margin-top:10px">
+          <div class="form-row">
+            <textarea id="relatoText" placeholder="Seu relato (o mais detalhado possível)"></textarea>
+            <input id="relatoLocal" type="text" placeholder="Local (opcional)">
+            <div style="display:flex;gap:8px">
+              <button type="button" class="primary" id="enviaBtn">Enviar</button>
+              <button type="button" class="ghost" id="limpaBtn">Limpar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="aside">
+      <div class="card">
+        <strong>Últimas</strong>
+        <ul class="small-list" style="margin-top:10px;padding-left:14px">
+          <li>Casal de viajantes desaparece após pernoitar em Cedro Morto</li>
+          <li>Moradores em alerta: noites silenciosas e sussurros nos campos</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <strong>Sobre a investigação</strong>
+        <p class="notice">A redação mantém contato com moradores e autoridades locais. Se tiver informação, use o botão 'Denunciar' ou procure a Taverna do Cedro.</p>
+      </div>
+
+      <div class="card" id="contato">
+        <strong>Contato</strong>
+        <p class="notice">Email: <span style="color:#e6eef2">redacao@cedromorto.local</span></p>
+        <p class="notice">Linha direta (anônima): <strong style="color:#e6eef2">(00) 0000-0000</strong></p>
+      </div>
+    </aside>
+
+    <footer style="grid-column:1/-1">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div>© Jornal de Cedro Morto — Relatos policiais e crônicas locais</div>
+        <div style="color:var(--muted);font-size:13px">Arquivo local — aberto em modo somente leitura</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- modal -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="box">
+      <div id="modalText">Relato enviado com sucesso (simulação). Obrigado.</div>
+      <button class="close" id="closeModal">Fechar</button>
+    </div>
+  </div>
+
+  <script>
+    // Interações simples (tudo local)
+    document.getElementById('enviaBtn').addEventListener('click', function(){
+      const texto = document.getElementById('relatoText').value.trim();
+      if(!texto){
+        alert('Por favor, escreva seu relato antes de enviar (simulação).');
+        return;
+      }
+      // mostra modal de confirmação (não envia para servidor)
+      document.getElementById('modalText').textContent = 'Relato enviado com sucesso (simulação). Obrigado pela colaboração.';
+      document.getElementById('modal').classList.add('show');
+      document.getElementById('modal').setAttribute('aria-hidden', 'false');
+      // limpa campos
+      document.getElementById('relatoText').value = '';
+      document.getElementById('relatoLocal').value = '';
+    });
+
+    document.getElementById('limpaBtn').addEventListener('click', function(){
+      document.getElementById('relatoText').value = '';
+      document.getElementById('relatoLocal').value = '';
+    });
+
+    document.getElementById('closeModal').addEventListener('click', function(){
+      document.getElementById('modal').classList.remove('show');
+      document.getElementById('modal').setAttribute('aria-hidden', 'true');
+    });
+
+    document.getElementById('btnDenunciar').addEventListener('click', function(){
+      // foca no form
+      window.scrollTo({top:document.getElementById('relatoForm').offsetTop - 30, behavior:'smooth'});
+      document.getElementById('relatoText').focus();
+    });
+
+    document.getElementById('btnLerMais').addEventListener('click', function(){
+      alert('Versão para jogadores: interpretação local. Procure a taverna e fale com Marta — ela sabe mais do que diz.');
+    });
+  </script>
+</body>
+</html>

@@ -11,6 +11,7 @@ from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.metrics import dp
 from kivymd.uix.gridlayout import MDGridLayout
+<<<<<<< HEAD
 from kivy.uix.scrollview import ScrollView
 from kivymd.uix.widget import MDWidget
 from kivy.core.text import LabelBase
@@ -21,6 +22,10 @@ from kivy.uix.label import Label
 font_path = os.path.join(os.path.dirname(__file__), "Duo-Dunkel.ttf")
 print("[DEBUG] Fonte:", font_path, "exists:", os.path.exists(font_path))
 LabelBase.register(name="BungeeShade", fn_regular=font_path)
+=======
+from kivy.uix.widget import Widget
+from kivy.uix.scrollview import ScrollView
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
 # ============================
 # Classes com listas de jogos
 # ============================
@@ -88,6 +93,7 @@ class TelaJogar(Screen):
         main_layout = MDBoxLayout(orientation="vertical")
         self.add_widget(main_layout)
 
+<<<<<<< HEAD
 
         top_layout = MDBoxLayout(
             orientation="horizontal",
@@ -129,12 +135,41 @@ class TelaJogar(Screen):
         main_layout.add_widget(top_layout)
 
         # ===== Lista de jogos =====
+=======
+        # ===== Barra superior =====
+        top_bar = MDBoxLayout(
+            orientation="horizontal",
+            size_hint_y=None,
+            height=dp(60),
+            padding=[10, 10, 10, 0]
+        )
+        main_layout.add_widget(top_bar)
+
+        back_btn = MDIconButton(
+            icon="arrow-left",
+            pos_hint={"center_y": 0.5},
+            on_release=self.voltar
+        )
+        top_bar.add_widget(back_btn)
+
+        title = MDLabel(
+            text="Selecione o jogo:",
+            font_style="H5",
+            theme_text_color="Custom",
+            text_color=(0,0,0,1),
+            valign="middle"
+        )
+        top_bar.add_widget(title)
+
+        # ===== Área onde ficará a lista de jogos =====
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         self.content_area = MDBoxLayout()
         main_layout.add_widget(self.content_area)
 
         # ===== Bottom Bar =====
         self.bottom_bar = BottomBar(self.trocar_aba)
         main_layout.add_widget(self.bottom_bar)
+<<<<<<< HEAD
 
         self.mostrar_jogos("Fund I")
 
@@ -148,6 +183,18 @@ class TelaJogar(Screen):
 
         self.content_area.clear_widgets()
 
+=======
+        self.mostrar_jogos("Fundamental I")
+
+    def trocar_aba(self, nome):
+        self.mostrar_jogos(nome)
+
+        # =====================================================================================
+    def mostrar_jogos(self, categoria):
+        self.content_area.clear_widgets()
+
+        # Seleção da categoria
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         if categoria == "Fundamental I":
             jogos = JogosPrimario.get()
         elif categoria == "Fundamental II":
@@ -155,8 +202,15 @@ class TelaJogar(Screen):
         else:
             jogos = JogosMedio.get()
 
+<<<<<<< HEAD
         jogos = jogos[:9]
 
+=======
+        # Limitar a 9 itens (3x3)
+        jogos = jogos[:9]
+
+        # ======== CONTAINER PRINCIPAL ========
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         container = MDBoxLayout(
             orientation="vertical",
             size_hint=(1, 1),
@@ -164,10 +218,15 @@ class TelaJogar(Screen):
             spacing=dp(5)
         )
 
+<<<<<<< HEAD
+=======
+        # ======== GRID TOTALMENTE RESPONSIVO ========
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         grid = MDGridLayout(
             cols=3,
             spacing=dp(12),
             padding=dp(10),
+<<<<<<< HEAD
             adaptive_height=True,
             size_hint=(1, None),
         )
@@ -177,6 +236,18 @@ class TelaJogar(Screen):
             card = MDCard(
                 size_hint=(1, None),
                 height=dp(150),
+=======
+            adaptive_height=True,     # <<< se ajusta automaticamente
+            size_hint=(1, None),
+        )
+
+        # ======== CRIAÇÃO DOS CARDS ========
+        for jogo in jogos:
+
+            card = MDCard(
+                size_hint=(1, None),  # ocupa exatamente 1/3 da linha
+                height=dp(150),       # altura fixa (pode mudar se quiser)
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
                 radius=[18],
                 elevation=4,
                 md_bg_color=(1, 1, 1, 0.96),
@@ -215,8 +286,16 @@ class TelaJogar(Screen):
         container.add_widget(grid)
         self.content_area.add_widget(container)
 
+<<<<<<< HEAD
     # ======================================================================
     def aciona_jogo(self, jogo):
+=======
+
+
+    # =====================================================================================
+    def aciona_jogo(self, jogo):
+        destino = self.manager.get_screen(jogo["tela"])
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         self.manager.current = jogo["tela"]
 
     def voltar(self, instance):
@@ -266,9 +345,16 @@ class BottomBar(MDBoxLayout):
         self.padding = dp(10)
         self.spacing = dp(20)
         self.md_bg_color = (1, 1, 1, 1)
+<<<<<<< HEAD
         self.radius = [20, 20, 0, 0]
 
         self.on_change = on_change
+=======
+        self.radius = [20, 20, 0, 0]  # borda arredondada em cima
+
+        self.on_change = on_change
+
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         self.buttons = {}
 
         abas = [
@@ -278,6 +364,7 @@ class BottomBar(MDBoxLayout):
         ]
 
         for nome, icon in abas:
+<<<<<<< HEAD
 
             # === Botão principal ===
             btn = MDBoxLayout(
@@ -340,10 +427,41 @@ class BottomBar(MDBoxLayout):
             # salva para depois alterar cor
             self.buttons[nome] = (ic, lbl_top, lbl_bottom)
 
+=======
+            btn = MDBoxLayout(
+                orientation="vertical",
+                size_hint=(1, 1),
+                padding=dp(5),
+                spacing=dp(2),
+                on_touch_down=self._make_callback(nome),
+            )
+
+            ic = MDIconButton(
+                icon=icon,
+                halign="center",
+                theme_text_color="Custom",
+                text_color=(0.4, 0.4, 0.4, 1)
+            )
+            lbl = MDLabel(
+                text=nome,
+                halign="center",
+                theme_text_color="Custom",
+                text_color=(0.4, 0.4, 0.4, 1),
+                font_size=dp(12)
+            )
+
+            btn.add_widget(ic)
+            btn.add_widget(lbl)
+
+            self.add_widget(btn)
+
+            self.buttons[nome] = (ic, lbl)
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
 
         self.selecionar("Fundamental I")
 
     def selecionar(self, nome):
+<<<<<<< HEAD
         # resetar todos
         for ic, t1, t2 in self.buttons.values():
             cor = (0.5, 0.5, 0.5, 1)
@@ -357,11 +475,24 @@ class BottomBar(MDBoxLayout):
         ic.text_color = azul
         t1.text_color = azul
         t2.text_color = azul
+=======
+        # resetar cores
+        for ic, lbl in self.buttons.values():
+            ic.text_color = (0.5, 0.5, 0.5, 1)
+            lbl.text_color = (0.5, 0.5, 0.5, 1)
+
+        # ativar azul
+        ic, lbl = self.buttons[nome]
+        azul = (0, 0.45, 1, 1)
+        ic.text_color = azul
+        lbl.text_color = azul
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
 
     def _make_callback(self, nome):
         def callback(instance, touch):
             if instance.collide_point(*touch.pos):
                 self.selecionar(nome)
+<<<<<<< HEAD
                 # corrige nomes diferentes
                 if nome == "Médio":
                     self.on_change("Medio")
@@ -371,6 +502,12 @@ class BottomBar(MDBoxLayout):
 
 
 
+=======
+                self.on_change(nome)
+        return callback
+
+
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
 #=======================================================================================================================
 # Tela de seleção da operação e rodadas do matematicando
 class TelaEscolhaNivel(Screen):
@@ -387,7 +524,11 @@ class TelaEscolhaNivel(Screen):
         title = MDLabel(
             text=titulo,
             halign="center",
+<<<<<<< HEAD
             font_name="BungeeShade",
+=======
+            font_style="H4",
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
             text_color=(1, 1, 1, 1),
             size_hint=(0.8, None),
             height=50,
@@ -399,7 +540,10 @@ class TelaEscolhaNivel(Screen):
             text="Quantas rodadas você deseja\n jogar em cada nível?",
             halign="center",
             font_size="20",
+<<<<<<< HEAD
             font_name="BungeeShade",
+=======
+>>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
             text_color=(1, 1, 1, 1),
             size_hint=(0.5, None),
             height=50,
