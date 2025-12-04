@@ -9,23 +9,20 @@ from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.slider import MDSlider
 from kivy.uix.switch import Switch
-<<<<<<< HEAD
 from kivy.core.text import LabelBase
 import os
 from kivy.metrics import dp
 from kivymd.uix.selectioncontrol import MDSwitch
 from kivymd.uix.button import MDRaisedButton
-# Registrar só 1 vez no app (main.py)
-font_path = os.path.join(os.path.dirname(__file__), "Duo-Dunkel.ttf")
-print("[DEBUG] Fonte:", font_path, "exists:", os.path.exists(font_path))
-LabelBase.register(name="BungeeShade", fn_regular=font_path)
 from kivy.uix.label import Label
 from kivy.uix.modalview import ModalView
 from kivy.animation import Animation
 from kivy.uix.boxlayout import BoxLayout
-=======
+from random import choice
 
->>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
+font_path = os.path.join(os.path.dirname(__file__), "Fontes", "Duo-Dunkel.ttf")
+print("[DEBUG] Fonte:", font_path, "exists:", os.path.exists(font_path))
+LabelBase.register(name="BungeeShade", fn_regular=font_path)
 
 
 CORAL = (1, 0.44, 0.26, 1)   # #FF7043
@@ -45,7 +42,12 @@ class TelaInicial(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = FloatLayout()
+
+        # 1. Configura Fundo
         self.setup_background(layout)
+
+        # 2. ADICIONA DECORAÇÃO (Ícones variados de matemática)
+        self.adicionar_decoracao_fundo(layout)
 
         # Logo
         logo = Image(
@@ -63,11 +65,7 @@ class TelaInicial(Screen):
             source="jogar.png",
             size_hint=(None, None),
             size=(400, 180),
-<<<<<<< HEAD
             pos_hint={"center_x": 0.5, "center_y": 0.68},
-=======
-            pos_hint={"center_x": 0.5, "center_y": 0.6},
->>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         )
         botao_jogar.bind(on_release=lambda *a: self.seleciona_n())
         layout.add_widget(botao_jogar)
@@ -76,16 +74,10 @@ class TelaInicial(Screen):
             source="conteudos.png",
             size_hint=(None, None),
             size=(400, 180),
-<<<<<<< HEAD
             pos_hint={"center_x": 0.5, "center_y": 0.5},
-=======
-            pos_hint={"center_x": 0.5, "center_y": 0.35},
->>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
         )
         botao_conteudos.bind(on_release=lambda *a: self.acao_conteudos())
         layout.add_widget(botao_conteudos)
-
-<<<<<<< HEAD
 
         botao_tutorial = ImageButton(
             source="tutorial.png",
@@ -96,13 +88,11 @@ class TelaInicial(Screen):
         botao_tutorial.bind(on_release=lambda *a: self.acao_tutorial())
         layout.add_widget(botao_tutorial)
 
-=======
-        # Botão configurações (ícone preto)
->>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
+        # Configurações (Ícone Preto)
         settings_button = MDIconButton(
             icon="cog",
             theme_text_color="Custom",
-            text_color=PRETO,
+            text_color=(0, 0, 0, 1), # Preto
             pos_hint={"right": 0.98, "top": 0.98},
         )
         settings_button.bind(on_release=lambda *a: self.abrir_tela_config())
@@ -119,6 +109,31 @@ class TelaInicial(Screen):
         )
         layout.add_widget(fundo)
 
+    def adicionar_decoracao_fundo(self, layout):
+        """Ícones mistos para a tela inicial"""
+        # Mix de álgebra, geometria, estatística e grandezas
+        icones = [
+            "calculator-variant", "shape-outline", "chart-pie",
+            "ruler", "function-variant", "pi", "sigma"
+        ]
+
+        positions = [
+            {"x": 0.05, "y": 0.85}, {"x": 0.85, "y": 0.9},
+            {"x": 0.1, "y": 0.6}, {"x": 0.85, "y": 0.6},
+            {"x": 0.05, "y": 0.15}, {"x": 0.9, "y": 0.2}
+        ]
+
+        for pos in positions:
+            icon = MDIconButton(
+                icon=choice(icones),
+                theme_text_color="Custom",
+                text_color=(0, 0, 0, 0.08), # Preto marca d'água (bem transparente)
+                pos_hint=pos,
+                icon_size=dp(45),
+                disabled=True
+            )
+            layout.add_widget(icon)
+
     def seleciona_n(self):
         self.manager.current = "jogar"
 
@@ -126,19 +141,12 @@ class TelaInicial(Screen):
         if self.manager:
             self.manager.current = "conteudos"
 
-<<<<<<< HEAD
     def acao_tutorial(self):
         if self.manager:
             self.manager.current = "tutorial"
 
     def abrir_tela_config(self):
         PainelConfiguracoes().open()
-=======
-    def abrir_tela_config(self, *args):
-        if self.manager:
-            self.manager.current = "config"
->>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
-
 
 # -------------------------------------------------
 # TELA DE CONTEÚDOS
@@ -157,34 +165,78 @@ class TelaConteudos(Screen):
         )
         layout.add_widget(background)
 
+        # ADICIONA DECORAÇÃO
+        self.adicionar_decoracao_fundo(layout)
+
+        # --- CORREÇÃO AQUI ---
+        # Em vez de calcular posições, usamos um container vertical (BoxLayout)
+        # que organiza os botões automaticamente sem sobreposição.
+        container_botoes = BoxLayout(
+            orientation="vertical",
+            spacing=dp(15),          # Espaço entre os botões
+            padding=[0, dp(20), 0, dp(20)], # Margem interna
+            size_hint=(0.55, 0.75),  # Largura 55%, Altura 75% da tela
+            pos_hint={"center_x": 0.5, "center_y": 0.5} # Centralizado
+        )
+
         topicos = [
-            ("novo_Operacoes.png", "tela"),
-            ("novo_Algebra.png", "algebra_tela"),
-            ("novo_Geometria.png", "geometria_tela"),
-            ("novo_Grandezas.png", "grandezas_tela"),
-            ("novo_Estatistica.png", "estatistica_tela"),
+            ("Estudos/novo_Operacoes.png", "tela"),
+            ("Estudos/novo_Algebra.png", "algebra_tela"),
+            ("Estudos/novo_Geometria.png", "geometria_tela"),
+            ("Estudos/novo_Grandezas.png", "grandezas_tela"),
+            ("Estudos/novo_Estatistica.png", "estatistica_tela"),
         ]
 
-        for i, (img, tela) in enumerate(topicos):
+        for img, tela in topicos:
+            # O botão agora se ajusta automaticamente dentro do container
             btn_img = ImageButton(
                 source=img,
-                size_hint=(0.55, 0.25),
-                pos_hint={"center_x": 0.5, "center_y": 0.8 - i * 0.13},
+                size_hint=(1, 1),    # Ocupa o espaço disponível na caixa
+                allow_stretch=True,  # Permite esticar se necessário
+                keep_ratio=True      # Mas mantém o formato original da imagem
             )
             btn_img.bind(on_release=lambda *a, t=tela: self.ir_para(t))
-            layout.add_widget(btn_img)
+            container_botoes.add_widget(btn_img)
+
+        layout.add_widget(container_botoes)
+        # ---------------------
 
         # Botão voltar (ícone preto)
         back_button = MDIconButton(
             icon="arrow-left",
             pos_hint={"x": 0, "top": 1},
             theme_text_color="Custom",
-            text_color=PRETO,
+            text_color=(0, 0, 0, 1), # Preto
         )
         back_button.bind(on_release=lambda *a: self.voltar())
         layout.add_widget(back_button)
 
         self.add_widget(layout)
+
+    def adicionar_decoracao_fundo(self, layout):
+        """Ícones mistos espalhados para preencher o vazio"""
+        icones = [
+            "book-open-page-variant", "lightbulb-outline", "school",
+            "pencil", "notebook", "calculator", "brain"
+        ]
+
+        # Posições focadas mais nas laterais para não brigar com a lista central
+        positions = [
+            {"x": 0.05, "y": 0.9}, {"x": 0.85, "y": 0.88},
+            {"x": 0.02, "y": 0.5}, {"x": 0.9, "y": 0.55},
+            {"x": 0.05, "y": 0.1}, {"x": 0.85, "y": 0.15}
+        ]
+
+        for pos in positions:
+            icon = MDIconButton(
+                icon=choice(icones),
+                theme_text_color="Custom",
+                text_color=(0, 0, 0, 0.08), # Preto marca d'água
+                pos_hint=pos,
+                icon_size=dp(45),
+                disabled=True
+            )
+            layout.add_widget(icon)
 
     def ir_para(self, tela_destino):
         if tela_destino in self.manager.screen_names:
@@ -195,8 +247,6 @@ class TelaConteudos(Screen):
     def voltar(self):
         self.manager.current = "inicial"
 
-
-<<<<<<< HEAD
 
 class PainelConfiguracoes(ModalView):
     def __init__(self, **kwargs):
@@ -330,148 +380,33 @@ class PainelConfiguracoes(ModalView):
             return True
         return super().on_touch_down(touch)
 
-=======
-# -------------------------------------------------
-# TELA DE CONFIGURAÇÕES
-# -------------------------------------------------
-class TelaConfiguracoes(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        layout = FloatLayout()
 
-        background = Image(
-            source="fundoapp.png",
-            allow_stretch=True,
-            keep_ratio=False,
-            size_hint=(1, 1),
-        )
-        layout.add_widget(background)
-
-        conteudo = MDBoxLayout(
-            orientation="vertical",
-            spacing=25,
-            size_hint=(0.85, 0.78),
-            pos_hint={"center_x": 0.5, "center_y": 0.5},
-            padding=[30, 40, 30, 40],
-        )
-
-        # Título (preto)
-        titulo = MDLabel(
-            text="CONFIGURAÇÕES",
-            halign="center",
-            theme_text_color="Custom",
-            text_color=PRETO,
-            font_style="H5",
-        )
-        conteudo.add_widget(titulo)
-
-        # Linha: som
-        linha_som = MDBoxLayout(orientation="horizontal", spacing=15, adaptive_height=True)
-
-        linha_som.add_widget(
-            MDLabel(
-                text="Som ativado",
-                halign="left",
-                theme_text_color="Custom",
-                text_color=PRETO,
-            )
-        )
-
-        self.switch_som = Switch(active=True)
-        linha_som.add_widget(self.switch_som)
-        conteudo.add_widget(linha_som)
-
-        # Volume texto (preto)
-        self.label_volume = MDLabel(
-            text="Volume: 75",
-            halign="center",
-            theme_text_color="Custom",
-            text_color=PRETO,
-            font_style="Subtitle1",
-        )
-        conteudo.add_widget(self.label_volume)
-
-        # Slider
-        self.slider_volume = MDSlider(min=0, max=100, value=75)
-        self.slider_volume.bind(value=self.atualizar_volume)
-        conteudo.add_widget(self.slider_volume)
-
-        # Botões usando sua paleta
-        botao_reportar = MDRectangleFlatButton(
-            text="Reportar erro",
-            text_color=PRETO,
-            line_color=CORAL,
-            pos_hint={"center_x": 0.5},
-        )
-        conteudo.add_widget(botao_reportar)
-
-        botao_dev = MDRectangleFlatButton(
-            text="Ver desenvolvedores",
-            text_color=PRETO,
-            line_color=LILAS,
-            pos_hint={"center_x": 0.5},
-        )
-        conteudo.add_widget(botao_dev)
-
-        botao_voltar = MDRectangleFlatButton(
-            text="Voltar",
-            text_color=PRETO,
-            line_color=CORAL,
-            pos_hint={"center_x": 0.5},
-        )
-        botao_voltar.bind(on_release=lambda *a: self.voltar_tela_inicial())
-        conteudo.add_widget(botao_voltar)
-
-        layout.add_widget(conteudo)
-        self.add_widget(layout)
-
-    def atualizar_volume(self, instance, value):
-        self.label_volume.text = f"Volume: {int(value)}"
-
-    def voltar_tela_inicial(self):
-        self.manager.current = "inicial"
->>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
-
-
-from meia_tela import TelaRepresentacoes, MeiaTela, DefinicoesTela
-from grandezas_tela import GrandezasTela, GrandezasRepresentacoes, DefinicoesGrandezas
-from meia_geometria import GeometriaRepresentacoes, DefinicoesGeometria, GeometriaTela
+#TELAS JOGOS
 from jogar import TelaJogar, TelaEscolhaNivel, JogosPrimario, JogosFundamental, JogosMedio
 from cross_nova import CruzadinhaScreen
 from calculo import calculoI, TelaFimDeJogo
 from algebra import AlgebraGameScreen, TelaFimAlgebra
 from fracoes import FracoesGameScreen, TelaFimFracoes
-from meia_algebra import AlgebraTela, AlgebraRepresentacoes, AlgebraDefinicoes
 from sudoku_logic import TelaSudoku
 from fracoes1 import TelaFracoesInfo, TelaFracoesRepresentacoes, TelaFracoesExplicacoes, TelaFracoesPropriedades
-from meia_estatistica import EstatisticaTela, EstatisticaRepresentacoes, DefinicoesEstatistica
-<<<<<<< HEAD
-from teste import TelaTutorial
-=======
->>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
+
+
+#TELA TUTORIAL
+from tutorial import TelaTutorial
+
+#TELAS ESTUDO
+from meia_tela import TelaRepresentacoes, MeiaTela, OperacoesDefinicoesTela
+from meia_algebra import AlgebraTela, AlgebraRepresentacoes, AlgebraDefinicoesTela
+from meia_grandezas import GrandezasTela, GrandezasRepresentacoes, GrandezasDefinicoesTela
+from meia_geometria import GeometriaRepresentacoes, GeometriaDefinicoesTela, GeometriaTela
+from meia_estatistica import EstatisticaTela, EstatisticaRepresentacoes, EstatisticaDefinicoesTela
 # ---------- App Principal ----------
 class TesteApp(MDApp):
     def build(self):
         sm = ScreenManager()
         sm.add_widget(TelaInicial(name="inicial"))
         sm.add_widget(TelaConteudos(name="conteudos"))
-<<<<<<< HEAD
-        #sm.add_widget(TelaConfiguracoes(name="config"))
-        sm.add_widget(TelaRepresentacoes(name="representacoes"))
-        sm.add_widget(MeiaTela(name="tela"))
         sm.add_widget(TelaTutorial(name="tutorial"))
-=======
-        sm.add_widget(TelaConfiguracoes(name="config"))
-        sm.add_widget(TelaRepresentacoes(name="representacoes"))
-        sm.add_widget(MeiaTela(name="tela"))
->>>>>>> 2269faa7446d3e2311a76c04b2417a3f19598fc4
-        sm.add_widget(DefinicoesTela(name="definicoes"))
-        sm.add_widget(GrandezasRepresentacoes(name="grandezas_representacoes"))
-        sm.add_widget(GrandezasTela(name="grandezas_tela"))
-        sm.add_widget(DefinicoesGrandezas(name="grandezas_definicoes"))
-        sm.add_widget(GeometriaTela(name="geometria_tela"))
-        sm.add_widget(DefinicoesGeometria(name="geometria_definicoes"))
-        sm.add_widget(GeometriaRepresentacoes(name="geometria_representacoes"))
         sm.add_widget(TelaJogar(name="jogar"))
         sm.add_widget(TelaEscolhaNivel(name="primario", dificuldade="primario", titulo="Fundamental I", tela_voltar="jogar"))
         sm.add_widget(TelaEscolhaNivel(name="fundamental", dificuldade="fundamental", titulo="Fundamental II", tela_voltar="jogar"))
@@ -482,19 +417,30 @@ class TesteApp(MDApp):
         sm.add_widget(CruzadinhaScreen(name="cross", dificuldade="medio"))
         sm.add_widget(AlgebraGameScreen(name="algebra"))
         sm.add_widget(TelaFimAlgebra(name="fim_algebra"))
-        sm.add_widget(TelaFimFracoes(name="fim_fracoes"))
         sm.add_widget(FracoesGameScreen(name="fracoes"))
-        sm.add_widget(AlgebraTela(name="algebra_tela"))
-        sm.add_widget(AlgebraRepresentacoes(name="algebra_representacoes"))
-        sm.add_widget(AlgebraDefinicoes(name="algebra_definicoes"))
         sm.add_widget(TelaSudoku(name="sudoku"))
         sm.add_widget(TelaFracoesInfo(name="fracoes_info"))
         sm.add_widget(TelaFracoesPropriedades(name="fracoes_propriedades"))
         sm.add_widget(TelaFracoesRepresentacoes(name="fracoes_representacoes"))
         sm.add_widget(TelaFracoesExplicacoes(name="fracoes_explicacoes"))
+
+        #TELAS ESTUDO
+        sm.add_widget(OperacoesDefinicoesTela(name="definicoes"))
+        sm.add_widget(TelaRepresentacoes(name="representacoes"))
+        sm.add_widget(MeiaTela(name="tela"))
+        sm.add_widget(GrandezasRepresentacoes(name="grandezas_representacoes"))
+        sm.add_widget(GrandezasTela(name="grandezas_tela"))
+        sm.add_widget(GrandezasDefinicoesTela(name="grandezas_definicoes"))
+        sm.add_widget(GeometriaTela(name="geometria_tela"))
+        sm.add_widget(GeometriaDefinicoesTela(name="geometria_definicoes"))
+        sm.add_widget(GeometriaRepresentacoes(name="geometria_representacoes"))
+        sm.add_widget(AlgebraTela(name="algebra_tela"))
+        sm.add_widget(AlgebraRepresentacoes(name="algebra_representacoes"))
+        sm.add_widget(AlgebraDefinicoesTela(name="algebra_definicoes"))
         sm.add_widget(EstatisticaTela(name="estatistica_tela"))
         sm.add_widget(EstatisticaRepresentacoes(name="estatistica_representacoes"))
-        sm.add_widget(DefinicoesEstatistica(name="estatistica_definicoes"))
+        sm.add_widget(EstatisticaDefinicoesTela(name="estatistica_definicoes"))
+
         return sm
 
 if __name__ == "__main__":
